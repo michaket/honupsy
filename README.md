@@ -5,6 +5,9 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/michaket/honupsy/graph/badge.svg)](https://app.codecov.io/gh/michaket/honupsy)
 <!-- badges: end -->
 
 The goal of honupsy is to provide tools for working with routinely
@@ -45,11 +48,11 @@ summarise_honos_units(cases)
 #> # A tibble: 5 × 15
 #>   unit  prop_honos_1_severe prop_honos_2_severe prop_honos_3_severe
 #>   <chr>               <dbl>               <dbl>               <dbl>
-#> 1 A                   0.340               0.234               0.362
-#> 2 B                   0.179               0.179               0.179
-#> 3 C                   0.154               0.231               0.462
-#> 4 D                   0.143               0.306               0.184
-#> 5 E                   0.179               0.231               0.282
+#> 1 A                  0.229                0.286               0.229
+#> 2 B                  0.0980               0.314               0.235
+#> 3 C                  0.3                  0.3                 0.175
+#> 4 D                  0.222                0.407               0.333
+#> 5 E                  0.149                0.234               0.255
 #> # ℹ 11 more variables: prop_honos_4_severe <dbl>, prop_honos_5_severe <dbl>,
 #> #   prop_honos_6_severe <dbl>, prop_honos_7_severe <dbl>,
 #> #   prop_honos_8_severe <dbl>, prop_honos_9_severe <dbl>,

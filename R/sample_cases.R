@@ -24,10 +24,17 @@
 #'   \item \code{age}: Patient age (numeric).
 #'   \item \code{admission}: Admission date (\code{Date}).
 #'   \item \code{discharge}: Discharge date (\code{Date}).
-#'   \item \code{honos_1}, \code{honos_2}, \dots, \code{honos_12}: HoNOS item
-#'     scores coded as integers, where 0–4 indicate severity and 9 indicates
-#'     "not known" or missing. The value 9 is sampled with a low probability
-#'     to reflect that missing HoNOS items are comparatively rare.
+#'   \item \code{honos_1}, \code{honos_2}, \dots, \code{honos_12}: Scores for the
+#'     twelve items of the Health of the Nation Outcome Scales (HoNOS). Each item
+#'     is coded as an integer according to the official scale:
+#'     \itemize{
+#'       \item 0 = no problem
+#'       \item 1 = problem of minor clinical significance, no action required
+#'       \item 2 = mild but definite problem
+#'       \item 3 = moderately severe problem
+#'       \item 4 = severe to very severe problem
+#'       \item 9 = not known / not applicable
+#'     }
 #' }
 #'
 #' @export

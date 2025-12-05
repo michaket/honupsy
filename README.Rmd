@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# honupsy <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {comorbidity} R package."/>
+# The {honupsy} Package: Tools for Working with Routine Psychiatric Patient Data <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {comorbidity} R package."/>
 
 <!-- badges: start -->
 

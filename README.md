@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# honupsy <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {comorbidity} R package."/>
+# The {honupsy} Package: Tools for Working with Routine Psychiatric Patient Data <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {comorbidity} R package."/>
 
 <!-- badges: start -->
 
@@ -48,11 +48,11 @@ summarise_honos_units(cases)
 #> # A tibble: 5 × 15
 #>   unit  prop_honos_1_severe prop_honos_2_severe prop_honos_3_severe
 #>   <chr>               <dbl>               <dbl>               <dbl>
-#> 1 A                   0.242               0.394               0.212
-#> 2 B                   0.283               0.348               0.283
-#> 3 C                   0.293               0.293               0.293
-#> 4 D                   0.208               0.354               0.188
-#> 5 E                   0.281               0.344               0.312
+#> 1 A                   0.245               0.143               0.306
+#> 2 B                   0.306               0.224               0.143
+#> 3 C                   0.233               0.302               0.209
+#> 4 D                   0.346               0.308               0.115
+#> 5 E                   0.333               0.273               0.121
 #> # ℹ 11 more variables: prop_honos_4_severe <dbl>, prop_honos_5_severe <dbl>,
 #> #   prop_honos_6_severe <dbl>, prop_honos_7_severe <dbl>,
 #> #   prop_honos_8_severe <dbl>, prop_honos_9_severe <dbl>,

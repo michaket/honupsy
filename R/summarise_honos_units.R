@@ -32,18 +32,19 @@
 #'
 #' @seealso \code{\link{sample_cases}} to generate example data.
 #'
+#' @importFrom rlang .data
 #' @export
 #'
 #' @examples
 #' # Generate example data and summarise HoNOS severity by unit
 #' cases <- sample_cases(n = 200)
 #' summarise_honos_units(cases)
-summarise_honos_units <- function(data) {
+summarise_honos_units <- function(data = data) {
   data |>
     # Recode 9 → NA for HoNOS items
     dplyr::mutate(
       dplyr::across(
-        honos_1:honos_12,
+        dplyr::starts_with("honos_"),
         ~ dplyr::case_match(.x, 9L ~ NA_integer_, .default = .x)
       )
     ) |>
@@ -52,26 +53,31 @@ summarise_honos_units <- function(data) {
       # Create severe indicators; HoNOS = 9 ("not known / not applicable")
       # is treated as 0 (not severe) in the dichotomised variable
       dplyr::across(
-        honos_1:honos_12,
+        dplyr::starts_with("honos_"),
         ~ dplyr::if_else(.x > 2, 1L, 0L, missing = 0L),
         .names = "{.col}_severe"
       ),
       # Length of stay
-      los = as.numeric(discharge - admission)
+      los = as.numeric(.data$discharge - .data$admission)
     ) |>
     dplyr::ungroup() |>
     dplyr::mutate(
-      honos_total_score = rowSums(dplyr::across(honos_1:honos_12), na.rm = TRUE)
+      honos_total_score = rowSums(
+        dplyr::across(
+          dplyr::starts_with("honos_") & !dplyr::ends_with("_severe")
+        ),
+        na.rm = TRUE
+      )
     ) |>
-    dplyr::group_by(unit) |>
+    dplyr::group_by(.data$unit) |>
     dplyr::summarise(
       dplyr::across(
         dplyr::starts_with("honos_") & dplyr::ends_with("_severe"),
         ~ mean(.x, na.rm = TRUE),
         .names = "prop_{.col}"
       ),
-      age_mean = mean(age, na.rm = TRUE),
-      los_mean = mean(los, na.rm = TRUE),
+      age_mean = mean(.data$age, na.rm = TRUE),
+      los_mean = mean(.data$los, na.rm = TRUE),
       .groups = "drop"
     )
 }

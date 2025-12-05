@@ -13,17 +13,14 @@ Description: Provides functions to import, process, and summarise routinely
     hospitals to explore how unit-level patient composition relates to nurse 
     staffing, short-term workload fluctuations, and long-term strategic
     staffing planning in inpatient psychiatric settings.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
     dplyr,
-    purrr,
-    readxl,
-    stats,
-    stringr
+    rlang,
+    stats
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

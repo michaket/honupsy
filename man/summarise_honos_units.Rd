@@ -4,7 +4,7 @@
 \alias{summarise_honos_units}
 \title{Summarise HoNOS Severity by Unit}
 \usage{
-summarise_honos_units(data)
+summarise_honos_units(data = data)
 }
 \arguments{
 \item{data}{A data frame or tibble with one row per case, containing at least

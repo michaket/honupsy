@@ -2,3 +2,4 @@
 
 export(sample_cases)
 export(summarise_honos_units)
+importFrom(rlang,.data)

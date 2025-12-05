@@ -7,7 +7,18 @@
 
 <!-- badges: end -->
 
-The goal of honupsy is to …
+The goal of honupsy is to provide tools for working with routinely
+collected inpatient psychiatric data, with a particular focus on the
+Health of the Nation Outcome Scales (HoNOS) and unit-level indicators
+relevant to nursing workload and patient composition.
+
+The package supports:
+
+- generating realistic synthetic psychiatric case data,
+- preparing case-level data,
+- summarizing unit-level HoNOS metrics,
+- supporting exploratory work for and workload- and nurse
+  staffing-related evaluation.
 
 ## Installation
 
@@ -25,7 +36,25 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(honupsy)
-## basic example code
+
+# generate demo data
+cases <- sample_cases(n = 200)
+
+# summarise
+summarise_honos_units(cases)
+#> # A tibble: 5 × 15
+#>   unit  prop_honos_1_severe prop_honos_2_severe prop_honos_3_severe
+#>   <chr>               <dbl>               <dbl>               <dbl>
+#> 1 A                   0.340               0.234               0.362
+#> 2 B                   0.179               0.179               0.179
+#> 3 C                   0.154               0.231               0.462
+#> 4 D                   0.143               0.306               0.184
+#> 5 E                   0.179               0.231               0.282
+#> # ℹ 11 more variables: prop_honos_4_severe <dbl>, prop_honos_5_severe <dbl>,
+#> #   prop_honos_6_severe <dbl>, prop_honos_7_severe <dbl>,
+#> #   prop_honos_8_severe <dbl>, prop_honos_9_severe <dbl>,
+#> #   prop_honos_10_severe <dbl>, prop_honos_11_severe <dbl>,
+#> #   prop_honos_12_severe <dbl>, age_mean <dbl>, los_mean <dbl>
 ```
 
 What is special about using `README.Rmd` instead of just `README.md`?

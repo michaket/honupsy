@@ -49,10 +49,11 @@ summarise_honos_units <- function(data) {
     ) |>
     dplyr::rowwise() |>
     dplyr::mutate(
-      # Create severe indicators
+      # Create severe indicators; HoNOS = 9 ("not known / not applicable")
+      # is treated as 0 (not severe) in the dichotomised variable
       dplyr::across(
         honos_1:honos_12,
-        ~ dplyr::case_when(.x > 2 ~ 1L, TRUE ~ 0L),
+        ~ dplyr::if_else(.x > 2, 1L, 0L, missing = 0L),
         .names = "{.col}_severe"
       ),
       # Length of stay

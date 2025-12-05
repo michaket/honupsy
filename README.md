@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# honupsy
+# honupsy <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {comorbidity} R package."/>
 
 <!-- badges: start -->
 
@@ -48,11 +48,11 @@ summarise_honos_units(cases)
 #> # A tibble: 5 × 15
 #>   unit  prop_honos_1_severe prop_honos_2_severe prop_honos_3_severe
 #>   <chr>               <dbl>               <dbl>               <dbl>
-#> 1 A                  0.229                0.286               0.229
-#> 2 B                  0.0980               0.314               0.235
-#> 3 C                  0.3                  0.3                 0.175
-#> 4 D                  0.222                0.407               0.333
-#> 5 E                  0.149                0.234               0.255
+#> 1 A                   0.242               0.394               0.212
+#> 2 B                   0.283               0.348               0.283
+#> 3 C                   0.293               0.293               0.293
+#> 4 D                   0.208               0.354               0.188
+#> 5 E                   0.281               0.344               0.312
 #> # ℹ 11 more variables: prop_honos_4_severe <dbl>, prop_honos_5_severe <dbl>,
 #> #   prop_honos_6_severe <dbl>, prop_honos_7_severe <dbl>,
 #> #   prop_honos_8_severe <dbl>, prop_honos_9_severe <dbl>,

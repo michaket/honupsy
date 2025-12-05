@@ -64,8 +64,10 @@ sample_cases <- function(
 
   # Generate discharge dates
   # simulate a plausible adult psychiatric length of stay distribution
-  df_cases$discharge <- df_cases$admission +
-    round(stats::rnorm(n, mean = 25, sd = 30))
+  los <- round(stats::rnorm(n, mean = 25, sd = 30))
+  los <- pmax(los, 1L) # ensure length of stay at least 1 day
+
+  df_cases$discharge <- df_cases$admission + los
 
   # Add 12 HoNOS items
   for (i in 1:12) {

@@ -1,10 +1,18 @@
 Package: honupsy
-Title: What the Package Does (One Line, Title Case)
+Title: Tools for Working with Routine Psychiatric Patient Data
 Version: 0.0.0.9000
 Authors@R: 
     person("Michael", "Ketzer", , "michael.ketzer@unibas.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9633-3947"))
-Description: What the package does (one paragraph).
+Description: Provides functions to import, process, and summarise routinely 
+    collected psychiatric patient data, with a focus on unit-level patient 
+    composition. The package supports the application of previously developed
+    patient weights based on the Health of the Nation Outcome Scales (HoNOS), a 
+    standardised instrument for assessing symptom severity, mental health 
+    status, and social functioning in psychiatric care. These tools enable 
+    hospitals to explore how unit-level patient composition relates to nurse 
+    staffing, short-term workload fluctuations, and long-term strategic
+    staffing planning in inpatient psychiatric settings.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

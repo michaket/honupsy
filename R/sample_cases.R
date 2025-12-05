@@ -6,7 +6,7 @@
 #' The simulated data are useful for examples, testing, and development of
 #' functions that work with routinely collected HoNOS data.
 #' The overall structure largely follows the Swiss data definition for the
-#' national measurements in adult inpatient psychiatry
+#' national measurements in adult inpatient psychiatry.
 #'
 #' @param n Integer. Number of cases to generate. Defaults to \code{1000}.
 #' @param units Character vector of unit identifiers from which units are
@@ -46,7 +46,8 @@ sample_cases <- function(
   df_cases <- data.frame(
     case_id = sample(10000:99999, size = n, replace = FALSE),
     unit = sample(units, size = n, replace = TRUE),
-    age = round(stats::rnorm(n, mean = 50, sd = 15)),
+    # simulate a plausible adult psychiatric inpatient age distribution
+    age = round(stats::rnorm(n, mean = 45, sd = 20)),
     admission = sample(
       seq(start_date, end_date, by = "day"),
       size = n,
@@ -55,8 +56,9 @@ sample_cases <- function(
   )
 
   # Generate discharge dates
+  # simulate a plausible adult psychiatric length of stay distribution
   df_cases$discharge <- df_cases$admission +
-    round(stats::rnorm(n, mean = 21, sd = 5))
+    round(stats::rnorm(n, mean = 25, sd = 30))
 
   # Add 12 HoNOS items
   for (i in 1:12) {
@@ -64,7 +66,9 @@ sample_cases <- function(
       c(0:4, 9),
       size = n,
       replace = TRUE,
-      prob = c(0.18, 0.20, 0.20, 0.20, 0.20, 0.02)
+      # simulate a plausible distribution of HoNOS item
+      # scores for adult psychiatric patients
+      prob = c(0.369, 0.20, 0.18, 0.16, 0.09, 0.001)
     )
   }
 

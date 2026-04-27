@@ -1,6 +1,6 @@
 #' Generate Sample Inpatient Cases With HoNOS Scores
 #'
-#'Creates a simulated data set of inpatient psychiatric cases with unit
+#' Creates a simulated data set of inpatient psychiatric cases with unit
 #' assignments, admission and discharge dates, age, and item scores from the
 #' Health of the Nation Outcome Scales (HoNOS).
 #' The simulated data are useful for examples, testing, and development of

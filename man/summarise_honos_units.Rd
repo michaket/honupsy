@@ -30,10 +30,11 @@ Proportion of cases on the unit with a severe score (> 2) on each HoNOS item.
 }
 \description{
 Summarises routinely collected inpatient psychiatric data at the unit level.
-The function treats the value 9 in Health of the Nation Outcome Scales (HoNOS)
-items as missing, creates indicators for severe problems (scores > 2), and
-returns the proportion of severe cases per HoNOS item and unit, alongside
-mean age and mean length of stay.
+HoNOS item scores of 9 ("not known / not applicable") are treated as missing.
+When computing severity indicators (score > 2), missing values are counted as
+non-severe so that missingness does not inflate severity proportions. The
+function returns the proportion of severe cases per HoNOS item, mean total
+HoNOS score, mean age, and mean length of stay, all aggregated at the unit level.
 }
 \details{
 The expected input structure corresponds to the output of

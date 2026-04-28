@@ -1,0 +1,196 @@
+---
+title: "Importing ANQ Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Importing ANQ Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(honupsy)
+```
+
+## Overview
+
+The honupsy package provides tools to import, validate and analyse data from
+the Swiss national quality measurement programme in inpatient psychiatry
+(Nationale Qualitätsmessung stationäre Psychiatrie, ANQ).
+
+This vignette covers the import step. All other analyses in the package build
+on the data structures produced here, so it is worth reading even if the
+technical details of file formats are not your main interest.
+
+## No additional data preparation required
+
+Swiss psychiatric clinics are required by law to collect and submit ANQ data
+annually. The data are submitted in a defined format -- either as text files
+or using the official ANQ data entry template (an Excel file provided by ANQ).
+
+**honupsy works directly with these submission files.** There is no need to
+reformat or restructure your data before importing. The same files you send
+to ANQ can be loaded straight into R.
+
+## What data are imported
+
+The ANQ measurement for adult inpatient psychiatry consists of five record
+types:
+
+| Record type | Content |
+|---|---|
+| MB | Minimal dataset (administrative and clinical data per case) |
+| MP | Additional psychiatric data per case |
+| PH | HoNOS symptom burden assessment at admission and discharge |
+| PB | BSCL patient self-report at admission and discharge |
+| FM | Coercive measures during inpatient stay |
+
+`import_anq()` imports all five record types and returns them as a named list
+of data frames, one per record type.
+
+## Supported file formats
+
+honupsy supports three file formats:
+
+**Text files** (`.txt`) with pipe (`|`), semicolon (`;`) or tab as delimiter --
+the format used for the mandatory ANQ submission to the Federal Statistical
+Office (BFS).
+
+**Simple XLSX** with one worksheet per record type, named MB, MP, PH, PB
+and FM.
+
+**The official ANQ data entry template** -- the Excel file provided by ANQ
+for manual data entry. honupsy automatically recognises this file by its
+worksheet names and handles the multi-row header structure.
+
+## Basic usage
+
+```{r, eval = FALSE}
+library(honupsy)
+
+# import from a single mixed text file
+data <- import_anq("path/to/data.txt")
+
+# import from the official ANQ data entry template
+data <- import_anq("path/to/ANQ_PSY_EP_Dateneingabe_Messjahr-2024.xlsx")
+
+# import from separate files per record type
+data <- import_anq(c(
+  MB = "path/to/mb.txt",
+  MP = "path/to/mp.txt",
+  PH = "path/to/ph.txt",
+  PB = "path/to/pb.txt",
+  FM = "path/to/fm.txt"
+))
+```
+
+It is also possible to import only a subset of record types:
+
+```{r, eval = FALSE}
+# import only MB and FM
+data <- import_anq(c(
+  MB = "path/to/mb.txt",
+  FM = "path/to/fm.txt"
+))
+```
+
+Record types not present in the input are returned as empty data frames with
+the correct column types, so downstream code does not need to check for
+missing datasets.
+
+## The import summary
+
+After a successful import, honupsy prints a brief summary:
+
+```{r}
+path <- system.file("extdata", "example.txt", package = "honupsy")
+data <- import_anq(path, validate = FALSE)
+```
+
+This tells you at a glance how many cases, assessments and measures were
+found in the data, and how many assessments were recorded as dropouts.
+
+## The returned data structure
+
+`import_anq()` returns a named list with five elements:
+
+```{r}
+names(data)
+```
+
+Each element is a data frame:
+
+```{r}
+# one row per case
+nrow(data$mb)
+
+# two rows per case: admission and discharge
+nrow(data$ph)
+
+# zero to many rows per case
+nrow(data$fm)
+```
+
+The data frames can be used directly with standard R tools and are compatible
+with tidyverse packages.
+
+A few selected columns to illustrate the structure:
+
+```{r}
+# MB: administrative and clinical data
+data$mb[, c("fid", "sex", "age_admission", "main_diagnosis",
+            "admission", "discharge")]
+```
+
+```{r}
+# PH: HoNOS assessments
+data$ph[, c("fid", "time_point_label", "is_dropout",
+            "honos_total", "honos_n_valid")]
+```
+
+```{r}
+# FM: coercive measures
+data$fm[, c("fid", "measure_label", "start_date",
+            "duration_min", "is_coercive_medication")]
+```
+
+## Data validation
+
+By default, `import_anq()` runs a plausibility check on the imported data
+and issues warnings if problems are found. The check covers:
+
+- Completeness: are all expected record types present?
+- FID consistency: do the case identifiers match across record types?
+- Content plausibility: are values in the expected ranges?
+
+```{r, eval = FALSE}
+# validation is on by default
+data <- import_anq("path/to/data.txt")
+
+# inspect the validation messages programmatically
+data$.validation
+```
+
+If you are confident in your data and want to suppress the validation step,
+use `validate = FALSE`:
+
+```{r, eval = FALSE}
+data <- import_anq("path/to/data.txt", validate = FALSE)
+```
+
+## A note on PB (BSCL)
+
+The BSCL patient self-report (PB) is not collected by all clinics. Forensic
+psychiatric institutions have been exempt from this measurement since
+1 July 2019. If your data do not contain PB records, `data$pb` will be an
+empty data frame -- this is expected and does not trigger a validation
+warning.
+
+## Next steps
+
+Once your data are imported you can proceed to descriptive summaries,
+change score analyses between admission and discharge, and the estimation
+procedures provided by honupsy. These are covered in the other vignettes.

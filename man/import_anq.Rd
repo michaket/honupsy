@@ -10,16 +10,18 @@ import_anq(path, validate = TRUE)
 \item{path}{character. Either a single path to a mixed file (TXT or XLSX),
 or a named character vector of paths to separate files. Names must
 correspond to record types:
-\code{c(MB = "mb.txt", MP = "mp.txt", PH = "ph.txt", FM = "fm.txt")}.
+\code{c(MB = "mb.txt", MP = "mp.txt", PH = "ph.txt",
+  PB = "pb.txt", FM = "fm.txt")}.
 Not all record types need to be provided.}
 
 \item{validate}{logical. Should a plausibility check be performed?
 Default: \code{TRUE}.}
 }
 \value{
-A named list with elements \code{mb}, \code{mp}, \code{ph} and
-\code{fm}, each as a data.frame. Record types not present in the input
-are returned as empty data.frames with the correct column types.
+A named list with elements \code{mb}, \code{mp}, \code{ph},
+\code{pb} and \code{fm}, each as a data.frame. Record types not present
+in the input are returned as empty data.frames with the correct column
+types.
 }
 \description{
 Reads ANQ data for the national quality measurement in inpatient adult
@@ -28,8 +30,8 @@ XLSX, either as a single mixed file or as separate files per record type.
 }
 \examples{
 # example files shipped with the package
-path_txt  <- system.file("extdata", "beispiel.txt",  package = "anqimport")
-path_xlsx <- system.file("extdata", "beispiel.xlsx", package = "anqimport")
+path_txt  <- system.file("extdata", "example.txt",  package = "honupsy")
+path_xlsx <- system.file("extdata", "example.xlsx", package = "honupsy")
 
 # single mixed TXT file
 data <- import_anq(path_txt)
@@ -40,10 +42,11 @@ data <- import_anq(path_xlsx)
 # access individual datasets
 head(data$mb)
 head(data$ph)
+head(data$pb)
 
 # import only MB and FM
-path_mb <- system.file("extdata", "beispiel_mb.txt", package = "anqimport")
-path_fm <- system.file("extdata", "beispiel_fm.txt", package = "anqimport")
+path_mb <- system.file("extdata", "example_mb.txt", package = "honupsy")
+path_fm <- system.file("extdata", "example_fm.txt", package = "honupsy")
 data <- import_anq(c(MB = path_mb, FM = path_fm))
 
 # skip validation
@@ -63,6 +66,7 @@ data <- import_anq(c(
   MB = "path/to/mb.txt",
   MP = "path/to/mp.txt",
   PH = "path/to/ph.txt",
+  PB = "path/to/pb.txt",
   FM = "path/to/fm.txt"
 ))
 }

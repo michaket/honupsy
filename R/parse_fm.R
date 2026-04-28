@@ -19,6 +19,10 @@ parse_fm <- function(records) {
 #' Parse a single FM row
 #' @noRd
 parse_fm_row <- function(r) {
+  # silently skip completely empty rows (common in Excel exports)
+  if (all(trimws(r) == "")) {
+    return(NULL)
+  }
   if (length(r) < 6) {
     warning(
       "FM row has only ",

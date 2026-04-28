@@ -19,6 +19,10 @@ parse_mp <- function(records) {
 #' Parse a single MP row
 #' @noRd
 parse_mp_row <- function(r) {
+  # silently skip completely empty rows (common in Excel exports)
+  if (all(trimws(r) == "")) {
+    return(NULL)
+  }
   if (length(r) < 35) {
     warning(
       "MP row has only ",

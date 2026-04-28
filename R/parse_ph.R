@@ -1,8 +1,7 @@
-# parse_ph.R
-
 #' Parse PH records into a data frame
 #' @param records list of character vectors, PH rows from read_anq_raw()
 #' @return data.frame with two rows per case (admission + discharge)
+#' @importFrom stats setNames
 #' @noRd
 parse_ph <- function(records) {
   rows <- lapply(records, parse_ph_row)
@@ -19,6 +18,10 @@ parse_ph <- function(records) {
 #' Parse a single PH row
 #' @noRd
 parse_ph_row <- function(r) {
+  # silently skip completely empty rows (common in Excel exports)
+  if (all(trimws(r) == "")) {
+    return(NULL)
+  }
   if (length(r) < 7) {
     warning(
       "PH row has only ",
@@ -195,17 +198,6 @@ honos_total_score <- function(...) {
   )
 }
 
-#' Label for HoNOS assessment time point
-#' @noRd
-time_point_label <- function(code) {
-  switch(
-    as.character(code),
-    "1" = "admission",
-    "2" = "discharge",
-    "3" = "other",
-    NA_character_
-  )
-}
 
 #' Empty PH data frame with correct column types
 #' @noRd

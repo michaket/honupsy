@@ -32,7 +32,14 @@ parse_datetime_anq <- function(x) {
 #' @noRd
 parse_time_anq <- function(x) {
   x <- trimws(x)
-  if (is.na(x) || x == "" || nchar(x) != 4) {
+  if (is.na(x) || x == "") {
+    return(NA_integer_)
+  }
+  # pad with leading zero if 3 characters (e.g. "830" -> "0830")
+  if (nchar(x) == 3L) {
+    x <- paste0("0", x)
+  }
+  if (nchar(x) != 4L) {
     return(NA_integer_)
   }
   as.integer(substr(x, 1, 2)) * 60L + as.integer(substr(x, 3, 4))
@@ -43,6 +50,10 @@ parse_time_anq <- function(x) {
 parse_int <- function(x) {
   x <- trimws(x)
   if (is.na(x) || x == "") {
+    return(NA_integer_)
+  }
+  # only accept strings that look like whole numbers (no decimal point)
+  if (grepl(".", x, fixed = TRUE)) {
     return(NA_integer_)
   }
   suppressWarnings(as.integer(x))
@@ -63,4 +74,18 @@ coercive_measure_label <- function(code) {
     "11" = "Isolation for infectious/somatic reasons"
   )
   unname(labels[as.character(code)])
+}
+
+#' Label for assessment time point
+#' Used by both HoNOS (PH) and BSCL (PB) parsers
+#' ANQ codes: 1=admission, 2=discharge, 3=other
+#' @noRd
+time_point_label <- function(code) {
+  switch(
+    as.character(code),
+    "1" = "admission",
+    "2" = "discharge",
+    "3" = "other",
+    NA_character_
+  )
 }

@@ -1,9 +1,8 @@
-# validate.R
-
 #' Validate an ANQ dataset
-#' @param data named list with mb, mp, ph, fm data.frames
+#' @param data named list with mb, mp, ph, pb, fm data.frames
 #' @return invisibly a named list of validation messages per section,
 #'         warnings are also issued
+#' @importFrom utils head
 #' @noRd
 validate_anq <- function(data) {
   msgs <- list(
@@ -11,6 +10,7 @@ validate_anq <- function(data) {
     fid = validate_fid(data),
     mb = if (!is.null(data$mb)) validate_mb(data$mb) else character(),
     ph = if (!is.null(data$ph)) validate_ph(data$ph) else character(),
+    pb = if (!is.null(data$pb)) validate_pb(data$pb) else character(),
     fm = if (!is.null(data$fm)) validate_fm(data$fm) else character()
   )
 
@@ -35,7 +35,9 @@ validate_anq <- function(data) {
 validate_structure <- function(data) {
   msgs <- character()
 
-  expected <- c("mb", "mp", "ph", "fm")
+  # MB, MP and PH are always expected
+  # PB and FM are optional -- absence is clinically valid
+  expected <- c("mb", "mp", "ph")
   missing <- expected[!expected %in% names(data)]
 
   if (length(missing) > 0) {
@@ -94,28 +96,30 @@ validate_fid <- function(data) {
     return(msgs)
   }
 
-  fid_mb <- unique(data$mb$fid)
+  # use raw FIDs for duplicate check, unique for set operations below
+  fid_mb_raw <- data$mb$fid
+  fid_mb <- unique(fid_mb_raw)
 
   # FIDs without a value
-  if (any(is.na(fid_mb) | fid_mb == "")) {
+  if (any(is.na(fid_mb_raw) | fid_mb_raw == "")) {
     msgs <- c(
       msgs,
       sprintf(
         "%d MB rows without FID",
-        sum(is.na(fid_mb) | fid_mb == "")
+        sum(is.na(fid_mb_raw) | fid_mb_raw == "")
       )
     )
   }
 
   # duplicate FIDs in MB
-  duplicated_fids <- fid_mb[duplicated(fid_mb)]
+  duplicated_fids <- fid_mb_raw[duplicated(fid_mb_raw)]
   if (length(duplicated_fids) > 0) {
     msgs <- c(
       msgs,
       sprintf(
         "%d duplicate FIDs in MB: %s",
         length(duplicated_fids),
-        paste(head(duplicated_fids, 5), collapse = ", ")
+        paste(head(unique(duplicated_fids), 5), collapse = ", ")
       )
     )
   }
@@ -168,6 +172,22 @@ validate_fid <- function(data) {
         )
       )
     }
+  }
+
+  # PB: FIDs not present in MB
+  if (!is.null(data$pb) && nrow(data$pb) > 0) {
+    fid_pb <- unique(data$pb$fid)
+    only_pb <- setdiff(fid_pb, fid_mb)
+    if (length(only_pb) > 0) {
+      msgs <- c(
+        msgs,
+        sprintf(
+          "%d FIDs in PB without a corresponding MB row",
+          length(only_pb)
+        )
+      )
+    }
+    # no warning for MB FIDs without PB -- PB is optional
   }
 
   # FM: FIDs not present in MB
@@ -262,7 +282,9 @@ validate_mb <- function(mb) {
 #' @noRd
 validate_ph <- function(ph) {
   msgs <- character()
-
+  if (nrow(ph) == 0) {
+    return(msgs)
+  }
   # per FID: exactly one admission and one discharge row expected
   ph_no_dropout <- ph[!ph$is_dropout, ]
 
@@ -313,6 +335,73 @@ validate_ph <- function(ph) {
         msgs,
         sprintf(
           "%d invalid values in %s (expected 0-4 or 9)",
+          n_invalid,
+          col
+        )
+      )
+    }
+  }
+
+  msgs
+}
+
+# -- PB ------------------------------------------------------------------------
+
+#' Content plausibility checks for PB
+#' @noRd
+validate_pb <- function(pb) {
+  msgs <- character()
+  if (nrow(pb) == 0) {
+    return(msgs)
+  }
+  # per FID: exactly one admission and one discharge row expected
+  pb_no_dropout <- pb[!pb$is_dropout, ]
+
+  if (nrow(pb_no_dropout) > 0) {
+    counts <- table(pb_no_dropout$fid, pb_no_dropout$time_point)
+
+    # duplicate admission assessments
+    if ("1" %in% colnames(counts)) {
+      n_dup <- sum(counts[, "1"] > 1L)
+      if (n_dup > 0) {
+        msgs <- c(
+          msgs,
+          sprintf(
+            "%d FIDs with more than one admission assessment (PB)",
+            n_dup
+          )
+        )
+      }
+    }
+
+    # duplicate discharge assessments
+    if ("2" %in% colnames(counts)) {
+      n_dup <- sum(counts[, "2"] > 1L)
+      if (n_dup > 0) {
+        msgs <- c(
+          msgs,
+          sprintf(
+            "%d FIDs with more than one discharge assessment (PB)",
+            n_dup
+          )
+        )
+      }
+    }
+  }
+
+  # BSCL item values must be in valid range (0-4)
+  item_cols <- paste0("b", 1:53)
+  item_cols <- item_cols[item_cols %in% names(pb)]
+
+  for (col in item_cols) {
+    n_invalid <- sum(
+      !is.na(pb[[col]]) & !(pb[[col]] %in% 0:4)
+    )
+    if (n_invalid > 0) {
+      msgs <- c(
+        msgs,
+        sprintf(
+          "%d invalid values in %s (expected 0-4)",
           n_invalid,
           col
         )

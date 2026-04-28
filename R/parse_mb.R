@@ -19,6 +19,9 @@ parse_mb <- function(records) {
 #' Parse a single MB row
 #' @noRd
 parse_mb_row <- function(r) {
+  if (all(trimws(r) == "")) {
+    return(NULL)
+  } # silently skipping empty rows
   if (length(r) < 52) {
     warning(
       "MB row has only ",

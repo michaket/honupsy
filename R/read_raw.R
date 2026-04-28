@@ -137,7 +137,7 @@ ANQ_TEMPLATE_SHEETS <- c(
   "MP - Psychiatrie Zusatzdaten" = "MP",
   "PH - HoNOS" = "PH",
   "PB - BSCL" = "PB",
-  "FM - Freiheitsbeschränkende M" = "FM"
+  "FM - Freiheitsbeschr\u00e4nkende M" = "FM"
 )
 
 #' Check whether an XLSX file is the official ANQ data entry template

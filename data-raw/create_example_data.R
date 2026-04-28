@@ -16,7 +16,8 @@ dir.create("inst/extdata", recursive = TRUE, showWarnings = FALSE)
 
 mb_rows <- list(
   # case 1: FID 5050286, PID 34986734
-  # female, 61 years, canton ZH, Swiss, admission 30.07.2012, discharge 08.08.2012
+  # female, 61 years, canton ZH, Swiss, admission 30.07.2012,
+  # discharge 08.08.2012
   # main diagnosis F200 (schizophrenia)
   c(
     "MB",
@@ -474,6 +475,404 @@ ph_rows <- list(
 )
 
 # ------------------------------------------------------------------------------
+# PB: 60 fields per row (7 header + 53 items)
+# taken from the ANQ data template example row, adjusted for our 3 cases
+# note: forensic psychiatry is exempt from BSCL since 01.07.2019
+# case 3 (FID 5050292) therefore has a dropout
+# ------------------------------------------------------------------------------
+
+pb_rows <- list(
+  # case 1: FID 5050286, admission
+  c(
+    "PB", # 1  record type
+    "12345678", # 2  facility
+    "5050286", # 3  FID
+    "1", # 4  time_point (1=admission)
+    "0", # 5  dropout_code (0=no dropout)
+    "", # 6  dropout_detail
+    "20120730", # 7  date
+    # items B1-B53 (fields 8-60), scored 0-4
+    "2",
+    "1",
+    "0",
+    "1",
+    "2",
+    "1",
+    "0",
+    "0",
+    "1",
+    "0", # B1-B10
+    "1",
+    "2",
+    "1",
+    "2",
+    "1",
+    "2",
+    "3",
+    "2",
+    "1",
+    "0", # B11-B20
+    "1",
+    "2",
+    "0",
+    "1",
+    "2",
+    "1",
+    "0",
+    "1",
+    "0",
+    "1", # B21-B30
+    "2",
+    "1",
+    "0",
+    "2",
+    "3",
+    "2",
+    "1",
+    "2",
+    "1",
+    "0", # B31-B40
+    "1",
+    "2",
+    "1",
+    "0",
+    "1",
+    "2",
+    "1",
+    "0",
+    "1",
+    "2", # B41-B50
+    "1",
+    "0",
+    "2" # B51-B53
+  ),
+
+  # case 1: FID 5050286, discharge
+  c(
+    "PB", # 1
+    "12345678", # 2
+    "5050286", # 3
+    "2", # 4  time_point (2=discharge)
+    "0", # 5
+    "", # 6
+    "20120806", # 7
+    # items B1-B53, generally lower scores at discharge
+    "1",
+    "0",
+    "0",
+    "0",
+    "1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0", # B1-B10
+    "0",
+    "1",
+    "0",
+    "1",
+    "0",
+    "1",
+    "2",
+    "1",
+    "0",
+    "0", # B11-B20
+    "0",
+    "1",
+    "0",
+    "0",
+    "1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0", # B21-B30
+    "1",
+    "0",
+    "0",
+    "1",
+    "2",
+    "1",
+    "0",
+    "1",
+    "0",
+    "0", # B31-B40
+    "0",
+    "1",
+    "0",
+    "0",
+    "0",
+    "1",
+    "0",
+    "0",
+    "0",
+    "1", # B41-B50
+    "0",
+    "0",
+    "1" # B51-B53
+  ),
+
+  # case 2: FID 5050297, admission
+  c(
+    "PB", # 1
+    "12345678", # 2
+    "5050297", # 3
+    "1", # 4
+    "0", # 5
+    "", # 6
+    "20120103", # 7
+    "3",
+    "2",
+    "1",
+    "1",
+    "3",
+    "3",
+    "4",
+    "4",
+    "2",
+    "2", # B1-B10
+    "1",
+    "1",
+    "0",
+    "2",
+    "2",
+    "1",
+    "1",
+    "3",
+    "3",
+    "2", # B11-B20
+    "2",
+    "1",
+    "1",
+    "4",
+    "4",
+    "4",
+    "4",
+    "1",
+    "2",
+    "3", # B21-B30
+    "2",
+    "2",
+    "4",
+    "1",
+    "1",
+    "1",
+    "0",
+    "0",
+    "0",
+    "1", # B31-B40
+    "1",
+    "1",
+    "0",
+    "0",
+    "0",
+    "0",
+    "1",
+    "2",
+    "1",
+    "0", # B41-B50
+    "4",
+    "1",
+    "0" # B51-B53
+  ),
+
+  # case 2: FID 5050297, discharge: dropout (discharge within 24h)
+  c(
+    "PB", # 1
+    "12345678", # 2
+    "5050297", # 3
+    "2", # 4  time_point (2=discharge)
+    "6", # 5  dropout_code (6=discharge within 24h of admission)
+    "", # 6  dropout_detail
+    "20120226", # 7  date
+    # items B1-B53 all empty for dropout
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ),
+
+  # case 3: FID 5050292, admission: dropout (forensic, exempt from BSCL)
+  c(
+    "PB", # 1
+    "12345678", # 2
+    "5050292", # 3
+    "1", # 4  time_point (1=admission)
+    "8", # 5  dropout_code (8=other -- forensic exemption)
+    "forensic psychiatry, exempt from BSCL since 01.07.2019", # 6
+    "20121223", # 7  date
+    # items B1-B53 all empty for dropout
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ),
+
+  # case 3: FID 5050292, discharge: dropout (forensic, exempt from BSCL)
+  c(
+    "PB", # 1
+    "12345678", # 2
+    "5050292", # 3
+    "2", # 4  time_point (2=discharge)
+    "8", # 5  dropout_code (8=other -- forensic exemption)
+    "forensic psychiatry, exempt from BSCL since 01.07.2019", # 6
+    "20121231", # 7  date
+    # items B1-B53 all empty for dropout
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  )
+)
+
+# ------------------------------------------------------------------------------
 # FM: 8 fields per row
 # taken directly from appendix A9
 # ------------------------------------------------------------------------------
@@ -523,6 +922,7 @@ all_lines <- c(
   as_pipe_lines(mb_rows),
   as_pipe_lines(mp_rows),
   as_pipe_lines(ph_rows),
+  as_pipe_lines(pb_rows),
   as_pipe_lines(fm_rows)
 )
 
@@ -536,6 +936,7 @@ message("Created: inst/extdata/example.txt")
 writeLines(as_pipe_lines(mb_rows), "inst/extdata/example_mb.txt")
 writeLines(as_pipe_lines(mp_rows), "inst/extdata/example_mp.txt")
 writeLines(as_pipe_lines(ph_rows), "inst/extdata/example_ph.txt")
+writeLines(as_pipe_lines(pb_rows), "inst/extdata/example_pb.txt")
 writeLines(as_pipe_lines(fm_rows), "inst/extdata/example_fm.txt")
 message("Created: inst/extdata/example_mb/mp/ph/fm.txt")
 
@@ -551,6 +952,7 @@ all_semi <- c(
   as_semi_lines(mb_rows),
   as_semi_lines(mp_rows),
   as_semi_lines(ph_rows),
+  as_semi_lines(pb_rows),
   as_semi_lines(fm_rows)
 )
 
@@ -565,6 +967,7 @@ xlsx_data <- list(
   MB = rows_to_df(mb_rows),
   MP = rows_to_df(mp_rows),
   PH = rows_to_df(ph_rows),
+  PB = rows_to_df(pb_rows),
   FM = rows_to_df(fm_rows)
 )
 
@@ -602,6 +1005,7 @@ if (!requireNamespace("writexl", quietly = TRUE)) {
     "MB - Minimales Datenset" = make_template_sheet(mb_rows),
     "MP - Psychiatrie Zusatzdaten" = make_template_sheet(mp_rows),
     "PH - HoNOS" = make_template_sheet(ph_rows),
+    "PB - BSCL" = make_template_sheet(pb_rows),
     "FM - Freiheitsbeschränkende M" = make_template_sheet(fm_rows)
   )
 

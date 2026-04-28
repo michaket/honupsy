@@ -1,7 +1,6 @@
 ---
 output: github_document
 ---
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
@@ -13,52 +12,104 @@ knitr::opts_chunk$set(
 )
 ```
 
-# The {honupsy} Package: Tools for Working with Routine Psychiatric Patient Data <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {comorbidity} R package."/>
+# The {honupsy} Package: Tools for Working with Routine Psychiatric Patient Data <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {honupsy} R package."/>
 
 <!-- badges: start -->
-
 [![R-CMD-check](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/michaket/honupsy/graph/badge.svg?token=IUR4493DS7)](https://codecov.io/gh/michaket/honupsy)
 <!-- badges: end -->
 
-The goal of honupsy is to provide tools for working with routinely collected inpatient psychiatric data, with a particular focus on the Health of the Nation Outcome Scales (HoNOS) and unit-level indicators relevant to nursing workload and patient composition.
+The goal of honupsy is to provide tools for working with routinely collected
+inpatient psychiatric data, with a particular focus on the Health of the Nation
+Outcome Scales (HoNOS) and unit-level indicators relevant to nursing workload
+and patient composition.
 
-The package supports:
+The package is built around the data infrastructure of the Swiss national
+quality measurement programme in inpatient psychiatry, coordinated by
+[ANQ](https://www.anq.ch). Participating clinics are required by law to
+collect and submit these data to ANQ. honupsy allows clinics and researchers
+to work with these data directly in R, without any additional data preparation
+steps.
 
--   generating realistic synthetic psychiatric case data,
--   preparing case-level data,
--   summarizing unit-level HoNOS metrics,
--   supporting exploratory work for and workload- and nurse staffing-related evaluation.
+The package currently supports:
 
+-   importing ANQ data in all standard submission formats (TXT with pipe,
+    semicolon or tab delimiter; XLSX; official ANQ data entry template)
+-   parsing all relevant record types: MB (minimal dataset), MP (psychiatry
+    supplementary data), PH (HoNOS), PB (BSCL), and FM (coercive measures)
+-   validating imported data for completeness and plausibility
+-   computing HoNOS total scores and handling missing or not-applicable items
+-   generating realistic synthetic psychiatric case data
+-   summarising unit-level HoNOS metrics
+
+Future versions will add:
+
+-   descriptive summaries at case and unit level
+-   time-series statistics (e.g. admission-to-discharge change scores)
+-   estimation procedures for workload and staffing-related analyses
 
 ## Installation
 
-You can install the development version of honupsy from [GitHub](https://github.com/) with:
+You can install the development version of honupsy from
+[GitHub](https://github.com/) with:
 
-``` r
+```{r}
 # install.packages("pak")
 pak::pak("michaket/honupsy")
 ```
 
-## Example
+## Examples
 
-This is a basic example which shows you how to solve a common problem:
+### Importing ANQ data
 
-```{r example}
+```{r example-import}
 library(honupsy)
 
-# generate demo data
+# path to the example file shipped with the package
+path <- system.file("extdata", "example.txt", package = "honupsy")
+
+# import -- uses the same file format submitted to ANQ
+data <- import_anq(path)
+
+# the result is a named list of data frames, one per record type
+names(data)
+
+# MB: one row per case
+head(data$mb[, c("fid", "sex", "age_admission", "main_diagnosis")])
+
+# PH: two rows per case (admission and discharge)
+head(data$ph[, c("fid", "time_point_label", "honos_total", "is_dropout")])
+
+# FM: one row per coercive measure
+head(data$fm[, c("fid", "measure_label", "duration_min")])
+```
+
+### Working with synthetic data
+
+```{r example-synthetic}
+# generate synthetic case data for testing and demonstration
 cases <- sample_cases(n = 200)
 
-# summarise
+# summarise HoNOS metrics at unit level
 summarise_honos_units(cases)
 ```
 
+## Data Format
 
+honupsy works with the standard ANQ data submission format. No reformatting
+is required: the same files your clinic prepares for submission to ANQ can
+be loaded directly into R with `import_anq()`. Supported formats are:
+
+- Pipe-, semicolon- or tab-delimited TXT files
+- XLSX files with one worksheet per record type
+- The official ANQ data entry template (Excel)
+
+Both single mixed files (all record types in one file) and separate files
+per record type are supported.
 
 ## About the Hex Sticker
 
-The honupsy hex sticker features a Valais Blacknose Sheep (Walliser 
-Schwarznasenschaf). These sheep are known for their exceptionally gentle and 
-approachable nature and are used in animal-assisted therapy and support for 
-children and adults with emotional or physical impairments..
+The honupsy hex sticker features a Valais Blacknose Sheep
+(Walliser Schwarznasenschaf). These sheep are known for their exceptionally
+gentle and approachable nature and are used in animal-assisted therapy and
+support for children and adults with emotional or physical impairments.

@@ -978,13 +978,13 @@ if (!requireNamespace("writexl", quietly = TRUE)) {
   writexl::write_xlsx(xlsx_data, "inst/extdata/example.xlsx")
   message("Created: inst/extdata/example.xlsx")
 
-  # --------------------------------------------------------------------------
+  # ------------------------------------------------------------------------------
   # 5. Copy of the official ANQ data entry template filled with example data
   # (for testing read_anq_template)
   # Sheet names and the "Ab hier Eingabe" marker are kept in German --
   # these are literal strings from the official ANQ template and must
   # not be translated
-  # --------------------------------------------------------------------------
+  # ------------------------------------------------------------------------------
 
   make_template_sheet <- function(rows) {
     df_data <- rows_to_df(rows)
@@ -1014,3 +1014,37 @@ if (!requireNamespace("writexl", quietly = TRUE)) {
 }
 
 message("Done. All example data written to inst/extdata/")
+
+
+# ------------------------------------------------------------------------------
+# 6. Unit assignment example files
+# Maps the three example FIDs to unit identifiers
+# ------------------------------------------------------------------------------
+
+unit_rows <- data.frame(
+  fid = c("5050286", "5050297", "5050292"),
+  unit = c("A1", "B2", "A1"),
+  stringsAsFactors = FALSE
+)
+
+# CSV
+utils::write.csv(unit_rows, "inst/extdata/example_units.csv", row.names = FALSE)
+message("Created: inst/extdata/example_units.csv")
+
+# TXT pipe-delimited
+writeLines(
+  c("fid|unit", paste(unit_rows$fid, unit_rows$unit, sep = "|")),
+  "inst/extdata/example_units.txt"
+)
+message("Created: inst/extdata/example_units.txt")
+
+# XLSX with non-standard column names (realistic clinic scenario)
+if (requireNamespace("writexl", quietly = TRUE)) {
+  unit_rows_clinic <- data.frame(
+    Fallnummer = c("5050286", "5050297", "5050292"),
+    Station = c("A1", "B2", "A1"),
+    stringsAsFactors = FALSE
+  )
+  writexl::write_xlsx(unit_rows_clinic, "inst/extdata/example_units.xlsx")
+  message("Created: inst/extdata/example_units.xlsx")
+}

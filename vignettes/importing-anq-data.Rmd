@@ -189,8 +189,50 @@ psychiatric institutions have been exempt from this measurement since
 empty data frame -- this is expected and does not trigger a validation
 warning.
 
+## Adding unit assignments
+
+The ANQ submission format does not include a unit or ward identifier. If your
+analyses require unit-level breakdowns, you can supply a separate lookup table
+that maps each case to a unit.
+
+The lookup table can be an Excel file, a CSV, or a delimited text file. The
+column names do not need to follow any particular convention – you specify
+which columns contain the FID and the unit identifier:
+
+```{r units}
+# load unit assignments from the example Excel file
+# column names reflect a typical clinic export
+units_path <- system.file("extdata", "example_units.xlsx",
+                           package = "honupsy")
+
+units <- import_unit_assignments(
+  units_path,
+  col_fid  = "Fallnummer",
+  col_unit = "Station"
+)
+
+units
+```
+
+Attach the unit assignments to the imported ANQ data:
+
+```{r assign-units}
+data <- assign_units(data, units)
+```
+
+A `unit` column is now available in all five datasets:
+
+```{r check-units}
+data$mb[, c("fid", "unit", "main_diagnosis")]
+data$ph[, c("fid", "unit", "time_point_label", "honos_total")]
+```
+
+If a patient transferred between units during their stay, we recommend using
+the unit the patient was on immediately before discharge.
+
 ## Next steps
 
-Once your data are imported you can proceed to descriptive summaries,
-change score analyses between admission and discharge, and the estimation
-procedures provided by honupsy. These are covered in the other vignettes.
+Once the data are imported and unit assignments are attached, the data frames
+can be used directly for analysis in R. Future versions of honupsy will add
+dedicated functions for descriptive summaries, admission-to-discharge change
+scores, and workload-related analyses.

@@ -46,7 +46,7 @@ Future versions will add:
 
 -   descriptive summaries at case and unit level
 -   time-series statistics (e.g. admission-to-discharge change scores)
--   estimation procedures for workload and staffing-related analyses
+-   estimation procedures for workload and staffing-related analyses.
 
 ## Installation
 

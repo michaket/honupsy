@@ -38,7 +38,7 @@ Future versions will add:
 
 - descriptive summaries at case and unit level
 - time-series statistics (e.g. admission-to-discharge change scores)
-- estimation procedures for workload and staffing-related analyses
+- estimation procedures for workload and staffing-related analyses.
 
 ## Installation
 
@@ -48,20 +48,10 @@ You can install the development version of honupsy from
 ``` r
 # install.packages("pak")
 pak::pak("michaket/honupsy")
-#> ✔ Updated metadata database: 8.14 MB in 15 files.
-#> ℹ Updating metadata database✔ Updating metadata database ... done
+#> ℹ Loading metadata database✔ Loading metadata database ... done
 #>  
-#> → Will install 1 package.
-#> → Will download 1 package with unknown size.
-#> + honupsy   0.0.0.9000 👷🏻🔧 ⬇ (GitHub: ec87d59)
-#> ℹ Getting 1 pkg with unknown size
-#> ✔ Got honupsy 0.0.0.9000 (source) (2.80 MB)
-#> ℹ Packaging honupsy 0.0.0.9000
-#> ✔ Packaged honupsy 0.0.0.9000 (1.3s)
-#> ℹ Building honupsy 0.0.0.9000
-#> ✔ Built honupsy 0.0.0.9000 (4.3s)
-#> ✔ Installed honupsy 0.0.0.9000 (github::michaket/honupsy@ec87d59) (54ms)
-#> ✔ 1 pkg + 18 deps: kept 12, added 1, dld 1 (NA B) [37.1s]
+#> ℹ No downloads are needed
+#> ✔ 1 pkg + 18 deps: kept 13 [5.6s]
 ```
 
 ## Examples
@@ -125,11 +115,11 @@ summarise_honos_units(cases)
 #> # A tibble: 5 × 16
 #>   unit  prop_honos_1_severe prop_honos_2_severe prop_honos_3_severe
 #>   <chr>               <dbl>               <dbl>               <dbl>
-#> 1 A                   0.119               0.286               0.310
-#> 2 B                   0.447               0.184               0.184
-#> 3 C                   0.317               0.220               0.268
-#> 4 D                   0.3                 0.375               0.25 
-#> 5 E                   0.333               0.282               0.128
+#> 1 A                   0.205               0.227               0.136
+#> 2 B                   0.227               0.341               0.318
+#> 3 C                   0.324               0.243               0.270
+#> 4 D                   0.229               0.257               0.143
+#> 5 E                   0.2                 0.275               0.3  
 #> # ℹ 12 more variables: prop_honos_4_severe <dbl>, prop_honos_5_severe <dbl>,
 #> #   prop_honos_6_severe <dbl>, prop_honos_7_severe <dbl>,
 #> #   prop_honos_8_severe <dbl>, prop_honos_9_severe <dbl>,

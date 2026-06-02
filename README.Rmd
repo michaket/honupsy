@@ -92,6 +92,7 @@ cases <- sample_cases(n = 200)
 
 # summarise HoNOS metrics at unit level
 summarise_honos_units(cases)
+
 ```
 
 ## Data Format

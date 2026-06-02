@@ -21,7 +21,9 @@ Imports:
     dplyr,
     rlang,
     stats,
-    readxl
+    readxl,
+    purrr,
+    tools
 Suggests: 
     knitr,
     rmarkdown,

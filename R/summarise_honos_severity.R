@@ -1,8 +1,9 @@
 #' Summarise HoNOS Severity at Admission by Unit
 #'
 #' Computes unit-level HoNOS severity indicators from admission assessments
-#' (time point 1, non-dropout). Returns one row per unit with mean item scores,
-#' proportion of severe cases per item (score > 2), and mean total score.
+#' (time point 1, non-dropout). Returns one row per unit with completion and
+#' data-quality counts, mean item scores, proportion of severe cases per item
+#' (score > 2), and mean total score.
 #'
 #' Item values of 9 ("not known / not applicable") are treated as missing and
 #' excluded from means. When computing the severe indicator, missing values
@@ -22,6 +23,14 @@
 #'   \item{unit}{Unit identifier (character).}
 #'   \item{n_cases}{Number of cases on the unit (from MB).}
 #'   \item{n_honos_adm}{Number of cases with a valid admission HoNOS assessment.}
+#'   \item{prop_assessed}{Proportion of cases with a valid admission HoNOS
+#'     assessment (\code{n_honos_adm / n_cases}). Quantifies how much of the
+#'     unit the severity figures actually describe.}
+#'   \item{mean_items_rated}{Mean number of HoNOS items rated (0-12) among
+#'     assessed cases. Below 12 indicates items coded 9 or left blank.
+#'     \code{NA} for units with no admission assessment.}
+#'   \item{n_partial}{Number of assessed cases with fewer than 12 items rated,
+#'     i.e. assessments whose total is summed over an incomplete item set.}
 #'   \item{h1_mean, \dots, h12_mean}{Mean score per HoNOS item at admission
 #'     (9s excluded).}
 #'   \item{h1_prop_severe, \dots, h12_prop_severe}{Proportion of cases with a
@@ -51,9 +60,17 @@ summarise_honos_severity <- function(data) {
 
   # HoNOS item column names as they appear in $ph
   item_cols <- c(
-    "h1_aggression", "h2_self_harm", "h3_substance_use", "h4_cognitive",
-    "h5_physical", "h6_hallucination", "h7_mood", "h8_other_mental",
-    "h9_relationships", "h10_daily_living", "h11_living_conditions",
+    "h1_aggression",
+    "h2_self_harm",
+    "h3_substance_use",
+    "h4_cognitive",
+    "h5_physical",
+    "h6_hallucination",
+    "h7_mood",
+    "h8_other_mental",
+    "h9_relationships",
+    "h10_daily_living",
+    "h11_living_conditions",
     "h12_occupation"
   )
 
@@ -91,6 +108,9 @@ summarise_honos_severity <- function(data) {
     dplyr::group_by(.data$unit) |>
     dplyr::summarise(
       n_honos_adm = dplyr::n(),
+      # data quality: how complete are the assessments behind the means
+      mean_items_rated = mean(.data$honos_n_valid, na.rm = TRUE),
+      n_partial = sum(.data$honos_n_valid < 12L, na.rm = TRUE),
       # means (NA for 9-coded values, already recoded in parser)
       dplyr::across(
         dplyr::all_of(item_cols),
@@ -110,16 +130,34 @@ summarise_honos_severity <- function(data) {
   # rename: h1_aggression_mean -> h1_mean, h1_aggression_severe_prop ->
   # h1_prop_severe (cleaner output column names)
   item_short <- paste0("h", 1:12)
-  old_mean   <- paste0(item_cols, "_mean")
-  new_mean   <- paste0(item_short, "_mean")
+  old_mean <- paste0(item_cols, "_mean")
+  new_mean <- paste0(item_short, "_mean")
   old_severe <- paste0(item_cols, "_severe_prop")
   new_severe <- paste0(item_short, "_prop_severe")
 
-  names(ph_summary)[match(old_mean,   names(ph_summary))] <- new_mean
+  names(ph_summary)[match(old_mean, names(ph_summary))] <- new_mean
   names(ph_summary)[match(old_severe, names(ph_summary))] <- new_severe
 
   # join onto unit counts so units with no HoNOS still appear
   result <- dplyr::left_join(unit_counts, ph_summary, by = "unit")
+
+  # units with no admission HoNOS: 0 assessed, not NA
+  result$n_honos_adm[is.na(result$n_honos_adm)] <- 0L
+  result$n_partial[is.na(result$n_partial)] <- 0L
+
+  # completion rate (mean_items_rated stays NA where there is nothing to rate)
+  result$prop_assessed <- result$n_honos_adm / result$n_cases
+
+  # put the quality block up front, keep honos_total_mean last
+  front <- c(
+    "unit",
+    "n_cases",
+    "n_honos_adm",
+    "prop_assessed",
+    "mean_items_rated",
+    "n_partial"
+  )
+  result <- result[, c(front, setdiff(names(result), front))]
 
   as.data.frame(result)
 }

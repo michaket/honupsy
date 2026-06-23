@@ -24,6 +24,12 @@ observed in at least 88 hours of the year).}
 (\code{census_mean / unit_size}).}
 \item{occ_rate_max}{Maximum daily occupancy rate observed.}
 }
+The result additionally carries an attribute \code{"excluded"}: a one-row
+data frame with \code{n_input} (cases in MB), \code{n_no_unit},
+\code{n_no_admission}, \code{n_no_discharge} (overlapping counts of the
+missing-field reasons), \code{n_excluded_missing} (cases dropped for any
+missing field), and \code{n_outside_year} (cases dropped because their
+clipped stay did not overlap the reference year).
 }
 \description{
 Expands each inpatient stay to hourly intervals and computes daily and
@@ -44,14 +50,19 @@ the result.
 
 The input must be the output of \code{\link{import_anq}} after unit
 assignments have been attached with \code{\link{assign_units}}. Cases
-without a unit assignment or with missing admission/discharge are excluded.
+without a unit assignment or with missing admission/discharge are excluded
+before expansion, and cases whose stay does not overlap the reference year
+are dropped during clipping. Both exclusion counts are reported via a
+message and stored on the result as the attribute \code{"excluded"} (a
+one-row data frame; access with \code{attr(result, "excluded")}).
 }
 \examples{
 \dontrun{
 data  <- import_anq("data.txt")
 units <- import_unit_assignments("units.xlsx")
 data  <- assign_units(data, units)
-summarise_occupancy(data, year = 2022)
+result <- summarise_occupancy(data, year = 2022)
+attr(result, "excluded")   # how many cases were dropped, and why
 }
 }
 \seealso{

@@ -17,7 +17,11 @@
 #'
 #' The input must be the output of \code{\link{import_anq}} after unit
 #' assignments have been attached with \code{\link{assign_units}}. Cases
-#' without a unit assignment or with missing admission/discharge are excluded.
+#' without a unit assignment or with missing admission/discharge are excluded
+#' before expansion, and cases whose stay does not overlap the reference year
+#' are dropped during clipping. Both exclusion counts are reported via a
+#' message and stored on the result as the attribute \code{"excluded"} (a
+#' one-row data frame; access with \code{attr(result, "excluded")}).
 #'
 #' @param data Named list. Output of \code{\link{import_anq}} with unit
 #'   assignments attached via \code{\link{assign_units}}.
@@ -34,6 +38,12 @@
 #'     (\code{census_mean / unit_size}).}
 #'   \item{occ_rate_max}{Maximum daily occupancy rate observed.}
 #' }
+#' The result additionally carries an attribute \code{"excluded"}: a one-row
+#' data frame with \code{n_input} (cases in MB), \code{n_no_unit},
+#' \code{n_no_admission}, \code{n_no_discharge} (overlapping counts of the
+#' missing-field reasons), \code{n_excluded_missing} (cases dropped for any
+#' missing field), and \code{n_outside_year} (cases dropped because their
+#' clipped stay did not overlap the reference year).
 #'
 #' @seealso \code{\link{summarise_composition}},
 #'   \code{\link{summarise_honos_severity}}
@@ -50,7 +60,8 @@
 #' data  <- import_anq("data.txt")
 #' units <- import_unit_assignments("units.xlsx")
 #' data  <- assign_units(data, units)
-#' summarise_occupancy(data, year = 2022)
+#' result <- summarise_occupancy(data, year = 2022)
+#' attr(result, "excluded")   # how many cases were dropped, and why
 #' }
 summarise_occupancy <- function(data, year) {
   if (!is.numeric(year) || length(year) != 1L || year != as.integer(year)) {
@@ -59,7 +70,16 @@ summarise_occupancy <- function(data, year) {
   year <- as.integer(year)
 
   mb <- .extract_mb(data)
-  mb <- mb[!is.na(mb$unit) & !is.na(mb$admission) & !is.na(mb$discharge), ]
+
+  # tally exclusion reasons before filtering (reasons overlap)
+  n_input <- nrow(mb)
+  n_no_unit <- sum(is.na(mb$unit))
+  n_no_admission <- sum(is.na(mb$admission))
+  n_no_discharge <- sum(is.na(mb$discharge))
+
+  keep <- !is.na(mb$unit) & !is.na(mb$admission) & !is.na(mb$discharge)
+  mb <- mb[keep, ]
+  n_excluded_missing <- n_input - nrow(mb)
 
   if (nrow(mb) == 0L) {
     stop(
@@ -102,6 +122,8 @@ summarise_occupancy <- function(data, year) {
   )
   mb_clipped <- mb_clipped[mb_clipped$start_hour < mb_clipped$end_excl, ]
 
+  n_outside_year <- nrow(mb) - nrow(mb_clipped)
+
   if (nrow(mb_clipped) == 0L) {
     stop(
       "No stays overlap with ",
@@ -110,6 +132,28 @@ summarise_occupancy <- function(data, year) {
       call. = FALSE
     )
   }
+
+  # report exclusions
+  excluded <- data.frame(
+    n_input = n_input,
+    n_no_unit = n_no_unit,
+    n_no_admission = n_no_admission,
+    n_no_discharge = n_no_discharge,
+    n_excluded_missing = n_excluded_missing,
+    n_outside_year = n_outside_year
+  )
+  message(sprintf(
+    paste0(
+      "summarise_occupancy: %d of %d cases used. ",
+      "Excluded: %d for missing unit/admission/discharge, ",
+      "%d not overlapping %d."
+    ),
+    nrow(mb_clipped),
+    n_input,
+    n_excluded_missing,
+    n_outside_year,
+    year
+  ))
 
   # expand each stay to the hours it covers
   hour_seqs <- purrr::map2(
@@ -197,5 +241,10 @@ summarise_occupancy <- function(data, year) {
     "occ_rate_max"
   )]
 
-  result[order(result$unit), ]
+  result <- result[order(result$unit), ]
+
+  # attach exclusion tally (dataset-level, so not a per-unit column)
+  attr(result, "excluded") <- excluded
+
+  result
 }

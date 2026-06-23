@@ -18,11 +18,14 @@ percentiles, and IQR for both age and length of stay.}
 \value{
 A \code{data.frame} with one row per unit. With
 \code{detail = "summary"} the columns are \code{unit}, \code{n_cases},
+\code{n_age_missing}, \code{n_los_missing}, \code{n_sex_missing},
 \code{age_mean}, \code{los_mean}, \code{n_female}, \code{prop_female}.
 With \code{detail = "full"} the distributional statistics
 (\code{age_median}, \code{age_sd}, \code{age_min}, \code{age_max},
 \code{age_q25}, \code{age_q75}, \code{age_iqr}, and the corresponding
-\code{los_*} columns) are added.
+\code{los_*} columns) are added. The \code{n_*_missing} columns count
+cases on the unit with a missing age, length of stay (missing admission
+or discharge date), or sex, respectively.
 }
 \description{
 Computes case-level descriptive statistics per unit from the MB dataset.
@@ -38,8 +41,10 @@ discharge (i.e. \code{difftime(discharge, admission, units = "days")}).
 All summary statistics are taken over non-missing values: cases with a
 missing component are still counted in \code{n_cases} but are excluded from
 the relevant statistic, and \code{prop_female} is computed only over cases
-with known sex. Given the structure of the ANQ MB dataset these fields are
-effectively always populated, so in practice the exclusion has no effect.
+with known sex. The \code{n_*_missing} columns report how many cases were
+excluded from each statistic. Given the structure of the ANQ MB dataset
+these fields are effectively always populated, so in practice these counts
+are normally zero and serve mainly as a check.
 }
 \examples{
 \dontrun{

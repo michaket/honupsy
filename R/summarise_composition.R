@@ -12,8 +12,10 @@
 #' All summary statistics are taken over non-missing values: cases with a
 #' missing component are still counted in \code{n_cases} but are excluded from
 #' the relevant statistic, and \code{prop_female} is computed only over cases
-#' with known sex. Given the structure of the ANQ MB dataset these fields are
-#' effectively always populated, so in practice the exclusion has no effect.
+#' with known sex. The \code{n_*_missing} columns report how many cases were
+#' excluded from each statistic. Given the structure of the ANQ MB dataset
+#' these fields are effectively always populated, so in practice these counts
+#' are normally zero and serve mainly as a check.
 #'
 #' @param data Named list. Output of \code{\link{import_anq}} with unit
 #'   assignments attached via \code{\link{assign_units}}.
@@ -24,11 +26,14 @@
 #'
 #' @return A \code{data.frame} with one row per unit. With
 #'   \code{detail = "summary"} the columns are \code{unit}, \code{n_cases},
+#'   \code{n_age_missing}, \code{n_los_missing}, \code{n_sex_missing},
 #'   \code{age_mean}, \code{los_mean}, \code{n_female}, \code{prop_female}.
 #'   With \code{detail = "full"} the distributional statistics
 #'   (\code{age_median}, \code{age_sd}, \code{age_min}, \code{age_max},
 #'   \code{age_q25}, \code{age_q75}, \code{age_iqr}, and the corresponding
-#'   \code{los_*} columns) are added.
+#'   \code{los_*} columns) are added. The \code{n_*_missing} columns count
+#'   cases on the unit with a missing age, length of stay (missing admission
+#'   or discharge date), or sex, respectively.
 #'
 #' @seealso \code{\link{summarise_honos_severity}},
 #'   \code{\link{summarise_occupancy}}
@@ -59,6 +64,10 @@ summarise_composition <- function(data, detail = c("summary", "full")) {
     dplyr::group_by(.data$unit) |>
     dplyr::summarise(
       n_cases = dplyr::n(),
+      # data quality: cases excluded from each statistic for missingness
+      n_age_missing = sum(is.na(.data$age_admission)),
+      n_los_missing = sum(is.na(.data$los)),
+      n_sex_missing = sum(is.na(.data$sex)),
       age_mean = mean(.data$age_admission, na.rm = TRUE),
       age_median = stats::median(.data$age_admission, na.rm = TRUE),
       age_sd = stats::sd(.data$age_admission, na.rm = TRUE),
@@ -87,6 +96,9 @@ summarise_composition <- function(data, detail = c("summary", "full")) {
     result <- result[, c(
       "unit",
       "n_cases",
+      "n_age_missing",
+      "n_los_missing",
+      "n_sex_missing",
       "age_mean",
       "los_mean",
       "n_female",

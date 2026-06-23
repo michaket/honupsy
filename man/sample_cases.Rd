@@ -2,59 +2,95 @@
 % Please edit documentation in R/sample_cases.R
 \name{sample_cases}
 \alias{sample_cases}
-\title{Generate Sample Inpatient Cases With HoNOS Scores}
+\title{Generate Synthetic ANQ Cases in Import-Pipeline Format}
 \usage{
 sample_cases(
   n = 1000,
-  units = LETTERS[1:5],
   start_date = as.Date("2023-01-01"),
-  end_date = as.Date("2023-12-31")
+  end_date = as.Date("2023-12-31"),
+  p_dropout_adm = 0,
+  p_dropout_dis = 0,
+  p_item_na = 0,
+  p_missing_discharge = 0,
+  include_discharge = TRUE
 )
 }
 \arguments{
-\item{n}{Integer. Number of cases to generate. Defaults to \code{1000}.}
+\item{n}{Integer. Number of cases to generate. Default \code{1000}.}
 
-\item{units}{Character vector of unit identifiers from which units are
-sampled. Defaults to \code{LETTERS[1:5]}.}
+\item{start_date, end_date}{Admission window as \code{Date}. Admission dates
+are sampled uniformly in \code{[start_date, end_date]}. Defaults span 2023.}
 
-\item{start_date}{Start date of the admission period as \code{Date}.
-Defaults to \code{as.Date("2023-01-01")}.}
+\item{p_dropout_adm, p_dropout_dis}{Numeric in \code{[0, 1]}. Probability that
+the admission / discharge HoNOS assessment is a dropout (no items rated).
+Defaults \code{0}.}
 
-\item{end_date}{End date of the admission period as \code{Date}.
-Defaults to \code{as.Date("2023-12-31")}.}
+\item{p_item_na}{Numeric in \code{[0, 1]}. Per-item probability that a rated
+HoNOS item is coded 9 ("not known / not applicable"). Default \code{0}.}
+
+\item{p_missing_discharge}{Numeric in \code{[0, 1]}. Probability that a case
+has no discharge date (its discharge HoNOS row is then a dropout).
+Default \code{0}.}
+
+\item{include_discharge}{Logical. Generate discharge (time point 2) HoNOS
+rows in addition to admission rows. Default \code{TRUE}.}
 }
 \value{
-A data frame with \code{n} rows and the following columns:
-\itemize{
-\item \code{case_id}: Unique case identifier (integer).
-\item \code{unit}: Unit identifier (character).
-\item \code{age}: Patient age (numeric).
-\item \code{admission}: Admission date (\code{Date}).
-\item \code{discharge}: Discharge date (\code{Date}).
-\item \code{honos_1}, \code{honos_2}, \dots, \code{honos_12}: Scores for the
-twelve items of the Health of the Nation Outcome Scales (HoNOS). Each item
-is coded as an integer according to the official scale:
-\itemize{
-\item 0 = no problem
-\item 1 = problem of minor clinical significance, no action required
-\item 2 = mild but definite problem
-\item 3 = moderately severe problem
-\item 4 = severe to very severe problem
-\item 9 = not known / not applicable
-}
-}
+A named list with elements \code{mb}, \code{mp}, \code{ph},
+\code{pb} and \code{fm}, identical in structure to \code{\link{import_anq}}.
 }
 \description{
-Creates a simulated data set of inpatient psychiatric cases with unit
-assignments, admission and discharge dates, age, and item scores from the
-Health of the Nation Outcome Scales (HoNOS).
-The simulated data are useful for examples, testing, and development of
-functions that work with routinely collected HoNOS data.
-The overall structure largely follows the Swiss data definition for the
-national measurements in adult inpatient psychiatry.
+Simulates inpatient psychiatric cases and returns them in exactly the format
+produced by \code{\link{import_anq}}: a named list with \code{mb}, \code{mp},
+\code{ph}, \code{pb} and \code{fm} data frames. The data are useful for
+examples, teaching, and testing the \code{summarise_*()} functions without
+real patient data.
+}
+\details{
+The generator works by writing valid ANQ raw records (MB and PH) to a
+temporary pipe-delimited file and reading them back with
+\code{\link{import_anq}}. The returned structure therefore comes from the
+real parser and cannot drift from it. In this version only MB and PH are
+generated; \code{mp}, \code{pb} and \code{fm} are returned as empty data
+frames, as they would be for an import that lacked those record types.
+
+Unit (ward) assignments are deliberately \emph{not} included, mirroring real
+ANQ data: attach them afterwards with \code{\link{import_unit_assignments}}
+and \code{\link{assign_units}} before calling the \code{summarise_*()}
+functions.
+
+The probability arguments default to clean data (no dropouts, no missing
+items, no missing discharge dates). Raise them to exercise the data-quality
+columns reported by the summary functions: \code{p_dropout_*} drives
+\code{prop_assessed}, \code{p_item_na} drives \code{mean_items_rated} and
+\code{n_partial}, and \code{p_missing_discharge} drives the occupancy
+exclusion count and \code{n_los_missing}.
+
+Randomness honours \code{set.seed()}; the function does not reseed.
 }
 \examples{
-# Generate 100 sample cases on three units
-cases <- sample_cases(n = 100, units = c("A", "B", "C"))
-head(cases)
+# clean data, default settings
+data <- sample_cases(n = 100)
+names(data)
+nrow(data$mb)
+
+# attach units, then summarise
+set.seed(1)
+lookup <- data.frame(
+  fid  = data$mb$fid,
+  unit = sample(c("A", "B", "C"), nrow(data$mb), replace = TRUE)
+)
+data <- assign_units(data, import_unit_assignments(lookup))
+summarise_composition(data)
+
+# messy data to exercise the quality columns
+messy <- sample_cases(
+  n = 200,
+  p_dropout_adm = 0.1,
+  p_item_na = 0.05,
+  p_missing_discharge = 0.08
+)
+}
+\seealso{
+\code{\link{import_anq}}, \code{\link{assign_units}}
 }

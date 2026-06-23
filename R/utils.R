@@ -23,22 +23,26 @@ parse_datetime_anq <- function(x) {
   if (nchar(x) == 8) {
     x <- paste0(x, "00")
   }
-  as.POSIXct(x, format = "%Y%m%d%H", tz = "Europe/Zurich")
+  as.POSIXct(x, format = "%Y%m%d%H", tz = "UTC")
 }
 
 #' Parse a time in ANQ format hhmm
 #' @param x character, 4 characters wide
 #' @return integer, minutes since midnight, or NA
 #' @noRd
-parse_datetime_anq <- function(x) {
+parse_time_anq <- function(x) {
   x <- trimws(x)
-  if (is.na(x) || x == "" || nchar(x) < 8) {
-    return(NA)
+  if (is.na(x) || x == "") {
+    return(NA_integer_)
   }
-  if (nchar(x) == 8) {
-    x <- paste0(x, "00")
+  # pad with leading zero if 3 characters (e.g. "830" -> "0830")
+  if (nchar(x) == 3L) {
+    x <- paste0("0", x)
   }
-  as.POSIXct(x, format = "%Y%m%d%H", tz = "UTC")
+  if (nchar(x) != 4L) {
+    return(NA_integer_)
+  }
+  as.integer(substr(x, 1, 2)) * 60L + as.integer(substr(x, 3, 4))
 }
 
 #' Parse an integer, treating empty strings as NA

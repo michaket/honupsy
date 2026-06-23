@@ -1,3 +1,8 @@
+# internal: min/max that return NA (not Inf/-Inf) when every value is missing,
+# so an all-missing column does not emit a base-R warning or a misleading bound
+safe_min <- function(x) if (all(is.na(x))) NA_real_ else min(x, na.rm = TRUE)
+safe_max <- function(x) if (all(is.na(x))) NA_real_ else max(x, na.rm = TRUE)
+
 #' Summarise Case Composition by Unit
 #'
 #' Computes case-level descriptive statistics per unit from the MB dataset.
@@ -71,16 +76,16 @@ summarise_composition <- function(data, detail = c("summary", "full")) {
       age_mean = mean(.data$age_admission, na.rm = TRUE),
       age_median = stats::median(.data$age_admission, na.rm = TRUE),
       age_sd = stats::sd(.data$age_admission, na.rm = TRUE),
-      age_min = min(.data$age_admission, na.rm = TRUE),
-      age_max = max(.data$age_admission, na.rm = TRUE),
+      age_min = safe_min(.data$age_admission),
+      age_max = safe_max(.data$age_admission),
       age_q25 = stats::quantile(.data$age_admission, 0.25, na.rm = TRUE),
       age_q75 = stats::quantile(.data$age_admission, 0.75, na.rm = TRUE),
       age_iqr = stats::IQR(.data$age_admission, na.rm = TRUE),
       los_mean = mean(.data$los, na.rm = TRUE),
       los_median = stats::median(.data$los, na.rm = TRUE),
       los_sd = stats::sd(.data$los, na.rm = TRUE),
-      los_min = min(.data$los, na.rm = TRUE),
-      los_max = max(.data$los, na.rm = TRUE),
+      los_min = safe_min(.data$los),
+      los_max = safe_max(.data$los),
       los_q25 = stats::quantile(.data$los, 0.25, na.rm = TRUE),
       los_q75 = stats::quantile(.data$los, 0.75, na.rm = TRUE),
       los_iqr = stats::IQR(.data$los, na.rm = TRUE),

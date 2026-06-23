@@ -8,18 +8,16 @@
 #' @inheritParams occupancy_daily
 #'
 #' @return A named list with two elements:
-#' \describe{
-#'   \item{by_unit}{A \code{data.frame} with one row per unit and columns
-#'     \code{unit}, \code{unit_size} (1\% rule capacity), \code{census_mean},
-#'     \code{census_max}, \code{occ_rate_mean} (\code{census_mean / unit_size})
-#'     and \code{occ_rate_max} (\code{census_max / unit_size}).}
-#'   \item{excluded}{A one-row \code{data.frame} with \code{n_input} (cases in
-#'     MB), \code{n_no_unit}, \code{n_no_admission}, \code{n_no_discharge}
-#'     (overlapping counts of the missing-field reasons),
-#'     \code{n_excluded_missing} (cases dropped for any missing field), and
-#'     \code{n_outside_year} (cases dropped because their clipped stay did not
-#'     overlap the reference year).}
-#' }
+#'
+#'   - `by_unit`: a data frame with one row per unit and columns `unit`,
+#'     `unit_size` (1% rule capacity), `census_mean`, `census_max`,
+#'     `occ_rate_mean` (`census_mean / unit_size`) and `occ_rate_max`
+#'     (`census_max / unit_size`).
+#'   - `excluded`: a one-row data frame with `n_input` (cases in MB),
+#'     `n_no_unit`, `n_no_admission`, `n_no_discharge` (overlapping counts of
+#'     the missing-field reasons), `n_excluded_missing` (cases dropped for any
+#'     missing field), and `n_outside_year` (cases dropped because their clipped
+#'     stay did not overlap the reference year).
 #'
 #' @seealso \code{\link{occupancy_daily}}, \code{\link{summarise_composition}},
 #'   \code{\link{summarise_honos_severity}}

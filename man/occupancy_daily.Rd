@@ -14,15 +14,13 @@ assignments attached via \code{\link{assign_units}}.}
 }
 \value{
 A named list with three elements:
-\describe{
-\item{daily}{A \code{data.frame} with one row per unit and day, sorted by
-unit then date, with columns \code{unit}, \code{date}, \code{census}
-(mean of the 24 hourly counts) and \code{occ_rate}
-(\code{census / unit_size}).}
-\item{unit_size}{A \code{data.frame} of \code{unit} and its estimated
-capacity (1\\% rule).}
-\item{excluded}{A one-row \code{data.frame} with the exclusion tally; see
-\code{\link{summarise_occupancy}}.}
+\itemize{
+\item \code{daily}: a data frame with one row per unit and day, sorted by unit then
+date, with columns \code{unit}, \code{date}, \code{census} (mean of the 24 hourly
+counts) and \code{occ_rate} (\code{census / unit_size}).
+\item \code{unit_size}: a data frame of \code{unit} and its estimated capacity (1\% rule).
+\item \code{excluded}: a one-row data frame with the exclusion tally; see
+\code{\link[=summarise_occupancy]{summarise_occupancy()}}.
 }
 }
 \description{

@@ -14,17 +14,16 @@ assignments attached via \code{\link{assign_units}}.}
 }
 \value{
 A named list with two elements:
-\describe{
-\item{by_unit}{A \code{data.frame} with one row per unit and columns
-\code{unit}, \code{unit_size} (1\\% rule capacity), \code{census_mean},
-\code{census_max}, \code{occ_rate_mean} (\code{census_mean / unit_size})
-and \code{occ_rate_max} (\code{census_max / unit_size}).}
-\item{excluded}{A one-row \code{data.frame} with \code{n_input} (cases in
-MB), \code{n_no_unit}, \code{n_no_admission}, \code{n_no_discharge}
-(overlapping counts of the missing-field reasons),
-\code{n_excluded_missing} (cases dropped for any missing field), and
-\code{n_outside_year} (cases dropped because their clipped stay did not
-overlap the reference year).}
+\itemize{
+\item \code{by_unit}: a data frame with one row per unit and columns \code{unit},
+\code{unit_size} (1\% rule capacity), \code{census_mean}, \code{census_max},
+\code{occ_rate_mean} (\code{census_mean / unit_size}) and \code{occ_rate_max}
+(\code{census_max / unit_size}).
+\item \code{excluded}: a one-row data frame with \code{n_input} (cases in MB),
+\code{n_no_unit}, \code{n_no_admission}, \code{n_no_discharge} (overlapping counts of
+the missing-field reasons), \code{n_excluded_missing} (cases dropped for any
+missing field), and \code{n_outside_year} (cases dropped because their clipped
+stay did not overlap the reference year).
 }
 }
 \description{

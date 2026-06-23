@@ -32,16 +32,13 @@
 #' @param year Integer. The calendar year to summarise (e.g. \code{2022}).
 #'
 #' @return A named list with three elements:
-#' \describe{
-#'   \item{daily}{A \code{data.frame} with one row per unit and day, sorted by
-#'     unit then date, with columns \code{unit}, \code{date}, \code{census}
-#'     (mean of the 24 hourly counts) and \code{occ_rate}
-#'     (\code{census / unit_size}).}
-#'   \item{unit_size}{A \code{data.frame} of \code{unit} and its estimated
-#'     capacity (1\% rule).}
-#'   \item{excluded}{A one-row \code{data.frame} with the exclusion tally; see
-#'     \code{\link{summarise_occupancy}}.}
-#' }
+#'
+#'   - `daily`: a data frame with one row per unit and day, sorted by unit then
+#'     date, with columns `unit`, `date`, `census` (mean of the 24 hourly
+#'     counts) and `occ_rate` (`census / unit_size`).
+#'   - `unit_size`: a data frame of `unit` and its estimated capacity (1% rule).
+#'   - `excluded`: a one-row data frame with the exclusion tally; see
+#'     [summarise_occupancy()].
 #'
 #' @seealso \code{\link{summarise_occupancy}}
 #'

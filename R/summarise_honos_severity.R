@@ -18,26 +18,25 @@
 #' @param data Named list. Output of \code{\link{import_anq}} with unit
 #'   assignments attached via \code{\link{assign_units}}.
 #'
-#' @return A \code{data.frame} with one row per unit and the following columns:
-#' \describe{
-#'   \item{unit}{Unit identifier (character).}
-#'   \item{n_cases}{Number of cases on the unit (from MB).}
-#'   \item{n_honos_adm}{Number of cases with a valid admission HoNOS assessment.}
-#'   \item{prop_assessed}{Proportion of cases with a valid admission HoNOS
-#'     assessment (\code{n_honos_adm / n_cases}). Quantifies how much of the
-#'     unit the severity figures actually describe.}
-#'   \item{mean_items_rated}{Mean number of HoNOS items rated (0-12) among
-#'     assessed cases. Below 12 indicates items coded 9 or left blank.
-#'     \code{NA} for units with no admission assessment.}
-#'   \item{n_partial}{Number of assessed cases with fewer than 12 items rated,
-#'     i.e. assessments whose total is summed over an incomplete item set.}
-#'   \item{h1_mean, \dots, h12_mean}{Mean score per HoNOS item at admission
-#'     (9s excluded).}
-#'   \item{h1_prop_severe, \dots, h12_prop_severe}{Proportion of cases with a
+#' @return A data frame with one row per unit and the following columns:
+#'
+#'   - `unit`: unit identifier (character).
+#'   - `n_cases`: number of cases on the unit (from MB).
+#'   - `n_honos_adm`: number of cases with a valid admission HoNOS assessment.
+#'   - `prop_assessed`: proportion of cases with a valid admission HoNOS
+#'     assessment (`n_honos_adm / n_cases`). Quantifies how much of the unit the
+#'     severity figures actually describe.
+#'   - `mean_items_rated`: mean number of HoNOS items rated (0-12) among
+#'     assessed cases. Below 12 indicates items coded 9 or left blank. `NA` for
+#'     units with no admission assessment.
+#'   - `n_partial`: number of assessed cases with fewer than 12 items rated,
+#'     i.e. assessments whose total is summed over an incomplete item set.
+#'   - `h1_mean`, ..., `h12_mean`: mean score per HoNOS item at admission
+#'     (9s excluded).
+#'   - `h1_prop_severe`, ..., `h12_prop_severe`: proportion of cases with a
 #'     severe score (> 2) per item. Missing and 9-coded values count as
-#'     non-severe.}
-#'   \item{honos_total_mean}{Mean total HoNOS score at admission.}
-#' }
+#'     non-severe.
+#'   - `honos_total_mean`: mean total HoNOS score at admission.
 #'
 #' @seealso \code{\link{summarise_composition}},
 #'   \code{\link{summarise_occupancy}}

@@ -7,21 +7,19 @@
 #'
 #' @inheritParams occupancy_daily
 #'
-#' @return A \code{data.frame} with one row per unit and the following columns:
+#' @return A named list with two elements:
 #' \describe{
-#'   \item{unit}{Unit identifier (character).}
-#'   \item{unit_size}{Estimated unit capacity (1\% rule).}
-#'   \item{census_mean}{Mean daily patient census across all days of the year.}
-#'   \item{census_max}{Maximum daily patient census observed.}
-#'   \item{occ_rate_mean}{Mean daily occupancy rate (\code{census_mean / unit_size}).}
-#'   \item{occ_rate_max}{Maximum daily occupancy rate (\code{census_max / unit_size}).}
+#'   \item{by_unit}{A \code{data.frame} with one row per unit and columns
+#'     \code{unit}, \code{unit_size} (1\% rule capacity), \code{census_mean},
+#'     \code{census_max}, \code{occ_rate_mean} (\code{census_mean / unit_size})
+#'     and \code{occ_rate_max} (\code{census_max / unit_size}).}
+#'   \item{excluded}{A one-row \code{data.frame} with \code{n_input} (cases in
+#'     MB), \code{n_no_unit}, \code{n_no_admission}, \code{n_no_discharge}
+#'     (overlapping counts of the missing-field reasons),
+#'     \code{n_excluded_missing} (cases dropped for any missing field), and
+#'     \code{n_outside_year} (cases dropped because their clipped stay did not
+#'     overlap the reference year).}
 #' }
-#' The result also carries the attribute \code{"excluded"}: a one-row data
-#' frame with \code{n_input} (cases in MB), \code{n_no_unit},
-#' \code{n_no_admission}, \code{n_no_discharge} (overlapping counts of the
-#' missing-field reasons), \code{n_excluded_missing} (cases dropped for any
-#' missing field), and \code{n_outside_year} (cases dropped because their
-#' clipped stay did not overlap the reference year).
 #'
 #' @seealso \code{\link{occupancy_daily}}, \code{\link{summarise_composition}},
 #'   \code{\link{summarise_honos_severity}}
@@ -35,15 +33,15 @@
 #' units <- import_unit_assignments("units.xlsx")
 #' data  <- assign_units(data, units)
 #' result <- summarise_occupancy(data, year = 2022)
-#' attr(result, "excluded")   # how many cases were dropped, and why
+#' result$by_unit
+#' result$excluded   # how many cases were dropped, and why
 #' }
 summarise_occupancy <- function(data, year) {
-  daily <- occupancy_daily(data, year)
-  unit_size <- attr(daily, "unit_size")
+  occ <- occupancy_daily(data, year)
 
   annual <- aggregate(
     census ~ unit,
-    data = daily,
+    data = occ$daily,
     FUN = function(x) c(mean = mean(x), max = max(x))
   )
   annual <- data.frame(
@@ -52,12 +50,12 @@ summarise_occupancy <- function(data, year) {
     census_max = annual$census[, "max"]
   )
 
-  result <- merge(annual, unit_size, by = "unit", all.x = TRUE)
-  result$occ_rate_mean <- result$census_mean / result$unit_size
-  result$occ_rate_max <- result$census_max / result$unit_size
+  by_unit <- merge(annual, occ$unit_size, by = "unit", all.x = TRUE)
+  by_unit$occ_rate_mean <- by_unit$census_mean / by_unit$unit_size
+  by_unit$occ_rate_max <- by_unit$census_max / by_unit$unit_size
 
-  result <- result[
-    order(result$unit),
+  by_unit <- by_unit[
+    order(by_unit$unit),
     c(
       "unit",
       "unit_size",
@@ -67,8 +65,7 @@ summarise_occupancy <- function(data, year) {
       "occ_rate_max"
     )
   ]
-  rownames(result) <- NULL
+  rownames(by_unit) <- NULL
 
-  attr(result, "excluded") <- attr(daily, "excluded")
-  result
+  list(by_unit = by_unit, excluded = occ$excluded)
 }

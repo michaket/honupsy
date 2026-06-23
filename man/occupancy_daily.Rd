@@ -13,17 +13,17 @@ assignments attached via \code{\link{assign_units}}.}
 \item{year}{Integer. The calendar year to summarise (e.g. \code{2022}).}
 }
 \value{
-A \code{data.frame} with one row per unit and day, sorted by unit
-then date, with columns:
+A named list with three elements:
 \describe{
-\item{unit}{Unit identifier (character).}
-\item{date}{Calendar day (\code{Date}).}
-\item{census}{Mean daily patient census (mean of the 24 hourly counts).}
-\item{occ_rate}{Occupancy rate for the day (\code{census / unit_size}).}
+\item{daily}{A \code{data.frame} with one row per unit and day, sorted by
+unit then date, with columns \code{unit}, \code{date}, \code{census}
+(mean of the 24 hourly counts) and \code{occ_rate}
+(\code{census / unit_size}).}
+\item{unit_size}{A \code{data.frame} of \code{unit} and its estimated
+capacity (1\\% rule).}
+\item{excluded}{A one-row \code{data.frame} with the exclusion tally; see
+\code{\link{summarise_occupancy}}.}
 }
-The result carries two attributes: \code{"unit_size"} (a data frame of
-\code{unit} and its estimated capacity) and \code{"excluded"} (the exclusion
-tally; see \code{\link{summarise_occupancy}}).
 }
 \description{
 Expands each inpatient stay to hourly intervals and returns the daily
@@ -59,9 +59,10 @@ on the result as the attribute \code{"excluded"}.
 data  <- import_anq("data.txt")
 units <- import_unit_assignments("units.xlsx")
 data  <- assign_units(data, units)
-daily <- occupancy_daily(data, year = 2022)
-head(daily)
-attr(daily, "unit_size")
+occ <- occupancy_daily(data, year = 2022)
+head(occ$daily)
+occ$unit_size
+occ$excluded
 }
 }
 \seealso{

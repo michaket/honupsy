@@ -13,21 +13,19 @@ assignments attached via \code{\link{assign_units}}.}
 \item{year}{Integer. The calendar year to summarise (e.g. \code{2022}).}
 }
 \value{
-A \code{data.frame} with one row per unit and the following columns:
+A named list with two elements:
 \describe{
-\item{unit}{Unit identifier (character).}
-\item{unit_size}{Estimated unit capacity (1\\% rule).}
-\item{census_mean}{Mean daily patient census across all days of the year.}
-\item{census_max}{Maximum daily patient census observed.}
-\item{occ_rate_mean}{Mean daily occupancy rate (\code{census_mean / unit_size}).}
-\item{occ_rate_max}{Maximum daily occupancy rate (\code{census_max / unit_size}).}
+\item{by_unit}{A \code{data.frame} with one row per unit and columns
+\code{unit}, \code{unit_size} (1\\% rule capacity), \code{census_mean},
+\code{census_max}, \code{occ_rate_mean} (\code{census_mean / unit_size})
+and \code{occ_rate_max} (\code{census_max / unit_size}).}
+\item{excluded}{A one-row \code{data.frame} with \code{n_input} (cases in
+MB), \code{n_no_unit}, \code{n_no_admission}, \code{n_no_discharge}
+(overlapping counts of the missing-field reasons),
+\code{n_excluded_missing} (cases dropped for any missing field), and
+\code{n_outside_year} (cases dropped because their clipped stay did not
+overlap the reference year).}
 }
-The result also carries the attribute \code{"excluded"}: a one-row data
-frame with \code{n_input} (cases in MB), \code{n_no_unit},
-\code{n_no_admission}, \code{n_no_discharge} (overlapping counts of the
-missing-field reasons), \code{n_excluded_missing} (cases dropped for any
-missing field), and \code{n_outside_year} (cases dropped because their
-clipped stay did not overlap the reference year).
 }
 \description{
 Annual per-unit occupancy: estimated unit size, mean and maximum daily
@@ -41,7 +39,8 @@ data  <- import_anq("data.txt")
 units <- import_unit_assignments("units.xlsx")
 data  <- assign_units(data, units)
 result <- summarise_occupancy(data, year = 2022)
-attr(result, "excluded")   # how many cases were dropped, and why
+result$by_unit
+result$excluded   # how many cases were dropped, and why
 }
 }
 \seealso{

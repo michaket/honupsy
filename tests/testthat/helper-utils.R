@@ -1,17 +1,13 @@
 # locates example files during both testing and installed use
 example_path <- function(filename) {
   # try installed package first -- works during devtools::check()
-  path <- system.file("extdata", filename, package = "anqimport")
+  path <- system.file("extdata", filename, package = "honupsy")
   if (nzchar(path)) {
     return(path)
   }
 
   # fall back to source tree -- works during devtools::test()
-  path <- file.path("inst", "extdata", filename)
-  if (file.exists(path)) {
-    return(path)
-  }
-
+  # (working directory is tests/testthat/, so the package root is two up)
   path <- file.path(
     dirname(dirname(getwd())),
     "inst",

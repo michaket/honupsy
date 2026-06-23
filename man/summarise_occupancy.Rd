@@ -16,45 +16,24 @@ assignments attached via \code{\link{assign_units}}.}
 A \code{data.frame} with one row per unit and the following columns:
 \describe{
 \item{unit}{Unit identifier (character).}
-\item{unit_size}{Estimated unit capacity (1\\% rule: maximum occupancy
-observed in at least 88 hours of the year).}
+\item{unit_size}{Estimated unit capacity (1\\% rule).}
 \item{census_mean}{Mean daily patient census across all days of the year.}
 \item{census_max}{Maximum daily patient census observed.}
-\item{occ_rate_mean}{Mean daily occupancy rate
-(\code{census_mean / unit_size}).}
-\item{occ_rate_max}{Maximum daily occupancy rate observed.}
+\item{occ_rate_mean}{Mean daily occupancy rate (\code{census_mean / unit_size}).}
+\item{occ_rate_max}{Maximum daily occupancy rate (\code{census_max / unit_size}).}
 }
-The result additionally carries an attribute \code{"excluded"}: a one-row
-data frame with \code{n_input} (cases in MB), \code{n_no_unit},
+The result also carries the attribute \code{"excluded"}: a one-row data
+frame with \code{n_input} (cases in MB), \code{n_no_unit},
 \code{n_no_admission}, \code{n_no_discharge} (overlapping counts of the
 missing-field reasons), \code{n_excluded_missing} (cases dropped for any
 missing field), and \code{n_outside_year} (cases dropped because their
 clipped stay did not overlap the reference year).
 }
 \description{
-Expands each inpatient stay to hourly intervals and computes daily and
-annual occupancy statistics per unit. Unit size is estimated from the data
-using the 1\\% rule: the largest occupancy level observed during at least 1\\%
-of all hours in the year (88 hours).
-}
-\details{
-Stays are clipped to the reference year before expansion. The hourly
-census follows a right-open convention: a patient is counted in hour
-\code{h} if their admission is strictly before \code{h + 1} and their
-discharge is strictly after \code{h} (i.e. \code{admission < h_end} and
-\code{discharge > h_start}).
-
-This function requires \code{purrr} and can be slow for large datasets
-(thousands of cases × 8760 hours). Consider running it once and caching
-the result.
-
-The input must be the output of \code{\link{import_anq}} after unit
-assignments have been attached with \code{\link{assign_units}}. Cases
-without a unit assignment or with missing admission/discharge are excluded
-before expansion, and cases whose stay does not overlap the reference year
-are dropped during clipping. Both exclusion counts are reported via a
-message and stored on the result as the attribute \code{"excluded"} (a
-one-row data frame; access with \code{attr(result, "excluded")}).
+Annual per-unit occupancy: estimated unit size, mean and maximum daily
+census, and the corresponding occupancy rates. This is a thin aggregation of
+\code{\link{occupancy_daily}}; use that function directly if you need the
+daily series (e.g. for plotting occupancy over time).
 }
 \examples{
 \dontrun{
@@ -66,6 +45,6 @@ attr(result, "excluded")   # how many cases were dropped, and why
 }
 }
 \seealso{
-\code{\link{summarise_composition}},
+\code{\link{occupancy_daily}}, \code{\link{summarise_composition}},
 \code{\link{summarise_honos_severity}}
 }

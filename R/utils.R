@@ -30,6 +30,7 @@ parse_datetime_anq <- function(x) {
 #' @param x character, 4 characters wide
 #' @return integer, minutes since midnight, or NA
 #' @noRd
+
 parse_time_anq <- function(x) {
   x <- trimws(x)
   if (is.na(x) || x == "") {

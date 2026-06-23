@@ -106,7 +106,9 @@ sample_cases <- function(
   )
 
   adm_date <- sample(seq(start_date, end_date, by = "day"), n, replace = TRUE)
-  los <- pmax(round(stats::rnorm(n, mean = 25, sd = 30)), 1L)
+  # length of stay in days: gamma is always positive and right-skewed, so no
+  # negatives to clamp (mean ~24, plus 1 to guarantee at least a one-day stay)
+  los <- 1L + round(stats::rgamma(n, shape = 2, scale = 12))
   dis_date <- adm_date + los
   adm_hour <- sample(0:23, n, replace = TRUE)
   dis_hour <- sample(0:23, n, replace = TRUE)

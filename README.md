@@ -48,83 +48,11 @@ You can install the development version of honupsy from
 ``` r
 # install.packages("pak")
 pak::pak("michaket/honupsy")
-#> 
-#> ✔ Updated metadata database: 7.74 MB in 4 files.
-#> 
-#> ℹ Updating metadata database
-#> ✔ Updating metadata database ... done
-#> 
-#> 
-#> → Will install 19 packages.
-#> → Will update 1 package.
-#> → Will download 19 CRAN packages (12.60 MB).
-#> → Will download 1 package with unknown size.
-#> + cellranger              1.1.0       ⬇ (104.28 kB)
-#> + cli                     3.6.6      🔧 ⬇ (1.47 MB)
-#> + dplyr                   1.2.1      🔧 ⬇ (1.64 MB)
-#> + generics                0.1.4       ⬇ (82.60 kB)
-#> + glue                    1.8.1      🔧 ⬇ (179.73 kB)
-#> + honupsy    0.0.0.9000 → 0.0.0.9000 👷🏻‍♂️🔧 ⬇ (GitHub: 453e48e)
-#> + lifecycle               1.0.5       ⬇ (132.98 kB)
-#> + magrittr                2.0.5      🔧 ⬇ (231.62 kB)
-#> + pillar                  1.11.1      ⬇ (660.11 kB)
-#> + pkgconfig               2.0.3       ⬇ (18.47 kB)
-#> + purrr                   1.2.2      🔧 ⬇ (585.36 kB)
-#> + R6                      2.6.1       ⬇ (87.28 kB)
-#> + readxl                  1.5.0      🔧 ⬇ (1.53 MB)
-#> + rematch                 2.0.0       ⬇ (16.67 kB)
-#> + rlang                   1.2.0      🔧 ⬇ (1.92 MB)
-#> + tibble                  3.3.1      🔧 ⬇ (659.83 kB)
-#> + tidyselect              1.2.1       ⬇ (226.89 kB)
-#> + utf8                    1.2.6      🔧 ⬇ (209.74 kB)
-#> + vctrs                   0.7.3      🔧 ⬇ (2.62 MB)
-#> + withr                   3.0.2       ⬇ (224.91 kB)
-#> ℹ Getting 19 pkgs (12.60 MB) and 1 pkg with unknown size
-#> ✔ Got generics 0.1.4 (aarch64-apple-darwin20) (82.60 kB)
-#> ✔ Got glue 1.8.1 (aarch64-apple-darwin20) (179.73 kB)
-#> ✔ Got cellranger 1.1.0 (aarch64-apple-darwin20) (104.28 kB)
-#> ✔ Got R6 2.6.1 (aarch64-apple-darwin20) (87.28 kB)
-#> ✔ Got tidyselect 1.2.1 (aarch64-apple-darwin20) (226.89 kB)
-#> ✔ Got pkgconfig 2.0.3 (aarch64-apple-darwin20) (18.47 kB)
-#> ✔ Got tibble 3.3.1 (aarch64-apple-darwin20) (659.83 kB)
-#> ✔ Got rematch 2.0.0 (aarch64-apple-darwin20) (16.67 kB)
-#> ✔ Got lifecycle 1.0.5 (aarch64-apple-darwin20) (132.98 kB)
-#> ✔ Got magrittr 2.0.5 (aarch64-apple-darwin20) (231.62 kB)
-#> ✔ Got utf8 1.2.6 (aarch64-apple-darwin20) (209.74 kB)
-#> ✔ Got withr 3.0.2 (aarch64-apple-darwin20) (224.91 kB)
-#> ✔ Got cli 3.6.6 (aarch64-apple-darwin20) (1.47 MB)
-#> ✔ Got pillar 1.11.1 (aarch64-apple-darwin20) (660.11 kB)
-#> ✔ Got purrr 1.2.2 (aarch64-apple-darwin20) (585.36 kB)
-#> ✔ Got dplyr 1.2.1 (aarch64-apple-darwin20) (1.64 MB)
-#> ✔ Got rlang 1.2.0 (aarch64-apple-darwin20) (1.92 MB)
-#> ✔ Got vctrs 0.7.3 (aarch64-apple-darwin20) (2.62 MB)
-#> ✔ Got readxl 1.5.0 (aarch64-apple-darwin20) (1.53 MB)
-#> ✔ Got honupsy 0.0.0.9000 (source) (1.92 MB)
-#> ✔ Installed R6 2.6.1  (208ms)
-#> ✔ Installed cellranger 1.1.0  (201ms)
-#> ✔ Installed cli 3.6.6  (229ms)
-#> ✔ Installed dplyr 1.2.1  (231ms)
-#> ✔ Installed generics 0.1.4  (245ms)
-#> ✔ Installed glue 1.8.1  (266ms)
-#> ✔ Installed lifecycle 1.0.5  (296ms)
-#> ✔ Installed magrittr 2.0.5  (340ms)
-#> ✔ Installed pillar 1.11.1  (139ms)
-#> ✔ Installed pkgconfig 2.0.3  (82ms)
-#> ✔ Installed purrr 1.2.2  (135ms)
-#> ✔ Installed readxl 1.5.0  (129ms)
-#> ✔ Installed rematch 2.0.0  (84ms)
-#> ✔ Installed rlang 1.2.0  (108ms)
-#> ✔ Installed tidyselect 1.2.1  (83ms)
-#> ✔ Installed tibble 3.3.1  (214ms)
-#> ✔ Installed utf8 1.2.6  (107ms)
-#> ✔ Installed vctrs 0.7.3  (133ms)
-#> ✔ Installed withr 3.0.2  (149ms)
-#> ℹ Packaging honupsy 0.0.0.9000
-#> ✔ Packaged honupsy 0.0.0.9000 (2.3s)
-#> ℹ Building honupsy 0.0.0.9000
-#> ✔ Built honupsy 0.0.0.9000 (5s)
-#> ✔ Installed honupsy 0.0.0.9000 (github::michaket/honupsy@453e48e) (152ms)
-#> ✔ 1 pkg + 19 deps: upd 1, added 19, dld 20 (NA B) [27s]
+#> ✔ Updated metadata database: 7.82 MB in 4 files.
+#> ℹ Updating metadata database✔ Updating metadata database ... done
+#>  
+#> ℹ No downloads are needed
+#> ✔ 1 pkg + 19 deps: kept 19 [14.8s]
 ```
 
 ## Examples
@@ -182,23 +110,6 @@ head(data$fm[, c("fid", "measure_label", "duration_min")])
 ``` r
 # generate synthetic case data for testing and demonstration
 cases <- sample_cases(n = 200)
-
-# summarise HoNOS metrics at unit level
-summarise_honos_units(cases)
-#> # A tibble: 5 × 16
-#>   unit  prop_honos_1_severe prop_honos_2_severe prop_honos_3_severe
-#>   <chr>               <dbl>               <dbl>               <dbl>
-#> 1 A                   0.256               0.205               0.154
-#> 2 B                   0.188               0.25                0.25 
-#> 3 C                   0.217               0.391               0.239
-#> 4 D                   0.2                 0.6                 0.233
-#> 5 E                   0.351               0.189               0.351
-#> # ℹ 12 more variables: prop_honos_4_severe <dbl>, prop_honos_5_severe <dbl>,
-#> #   prop_honos_6_severe <dbl>, prop_honos_7_severe <dbl>,
-#> #   prop_honos_8_severe <dbl>, prop_honos_9_severe <dbl>,
-#> #   prop_honos_10_severe <dbl>, prop_honos_11_severe <dbl>,
-#> #   prop_honos_12_severe <dbl>, age_mean <dbl>, los_mean <dbl>,
-#> #   honos_total_mean <dbl>
 ```
 
 ## Data Format

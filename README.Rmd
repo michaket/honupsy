@@ -90,8 +90,6 @@ head(data$fm[, c("fid", "measure_label", "duration_min")])
 # generate synthetic case data for testing and demonstration
 cases <- sample_cases(n = 200)
 
-# summarise HoNOS metrics at unit level
-summarise_honos_units(cases)
 
 ```
 

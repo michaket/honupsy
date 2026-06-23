@@ -56,9 +56,14 @@ test_that("missing discharge is counted in n_los_missing", {
   d <- sim_units(150, p_missing_discharge = 1)
   comp <- summarise_composition(d)
 
-  expect_equal(comp$n_los_missing, comp$n_cases) # every LOS missing
+  expect_equal(comp$n_los_missing, comp$n_cases)
   expect_true(all(comp$n_age_missing == 0L))
   expect_true(all(comp$n_sex_missing == 0L))
+
+  # all-NA LOS -> bounds are NA, not Inf/-Inf (guards safe_min/safe_max)
+  full <- summarise_composition(d, detail = "full")
+  expect_true(all(is.na(full$los_min)))
+  expect_true(all(is.na(full$los_max)))
 })
 
 

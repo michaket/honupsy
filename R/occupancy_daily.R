@@ -84,9 +84,15 @@ occupancy_daily <- function(data, year) {
     )
   }
 
-  # period boundaries
-  start_yr <- as.POSIXct(paste0(year, "-01-01 00:00:00"), tz = "UTC")
-  end_yr <- as.POSIXct(paste0(year + 1L, "-01-01 00:00:00"), tz = "UTC")
+  # period boundaries -- built in the data's own timezone so that the hourly
+  # spine and the admission/discharge comparisons share a tzone (otherwise
+  # pmax/pmin warn about inconsistent 'tzone' attributes)
+  tz <- attr(mb$admission, "tzone")
+  if (is.null(tz) || length(tz) == 0L) {
+    tz <- ""
+  }
+  start_yr <- as.POSIXct(paste0(year, "-01-01 00:00:00"), tz = tz)
+  end_yr <- as.POSIXct(paste0(year + 1L, "-01-01 00:00:00"), tz = tz)
 
   # one row per unit
   units_df <- data.frame(
@@ -170,20 +176,21 @@ occupancy_daily <- function(data, year) {
   # 1% of hours in a year = 8760 * 0.01 = 87.6, rounded up to 88
   threshold <- ceiling(0.01 * length(unique(hours_spine$date_hour)))
 
+  # how many hours each occupancy level occurs, per unit
   hour_counts <- aggregate(
-    n_patients ~ unit + n_patients,
-    data = hourly_census,
-    FUN = length
+    rep(1L, nrow(hourly_census)),
+    by = list(unit = hourly_census$unit, level = hourly_census$n_patients),
+    FUN = sum
   )
   names(hour_counts)[3] <- "n_hours"
 
   eligible <- hour_counts[hour_counts$n_hours >= threshold, ]
 
-  unit_size <- aggregate(n_patients ~ unit, data = eligible, FUN = max)
+  unit_size <- aggregate(level ~ unit, data = eligible, FUN = max)
   names(unit_size)[2] <- "unit_size"
 
   # daily census: average hourly counts within each day
-  hourly_census$date <- as.Date(hourly_census$date_hour, tz = "UTC")
+  hourly_census$date <- as.Date(hourly_census$date_hour, tz = tz)
 
   daily <- aggregate(
     n_patients ~ unit + date,

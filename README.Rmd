@@ -1,6 +1,7 @@
 ---
 output: github_document
 ---
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
@@ -39,14 +40,16 @@ The package currently supports:
     supplementary data), PH (HoNOS), PB (BSCL), and FM (coercive measures)
 -   validating imported data for completeness and plausibility
 -   computing HoNOS total scores and handling missing or not-applicable items
--   generating realistic synthetic psychiatric case data
--   summarising unit-level HoNOS metrics
+-   attaching user-supplied unit (ward) assignments to imported data
+-   summarising case composition, admission HoNOS severity, and unit
+    occupancy at the unit level
+-   generating synthetic HoNOS case data for quick experimentation
 
 Future versions will add:
 
--   descriptive summaries at case and unit level
--   time-series statistics (e.g. admission-to-discharge change scores)
--   estimation procedures for workload and staffing-related analyses.
+-   admission-to-discharge change scores (HoNOS and BSCL)
+-   BSCL severity summaries at the unit level
+-   estimation procedures for workload and staffing-related analyses
 
 ## Installation
 
@@ -77,20 +80,112 @@ names(data)
 # MB: one row per case
 head(data$mb[, c("fid", "sex", "age_admission", "main_diagnosis")])
 
-# PH: two rows per case (admission and discharge)
+# PH: two rows per case (admission and discharge), HoNOS
 head(data$ph[, c("fid", "time_point_label", "honos_total", "is_dropout")])
+
+# PB: two rows per case (admission and discharge), BSCL
+head(data$pb[, c("fid", "time_point_label", "bscl_total", "is_dropout")])
 
 # FM: one row per coercive measure
 head(data$fm[, c("fid", "measure_label", "duration_min")])
 ```
 
-### Working with synthetic data
+### Assigning units
+
+Unit (ward) assignments are not part of the standard ANQ submission format, so
+they are supplied separately and attached to the imported data. In practice you
+would read your own lookup file with `import_unit_assignments()`; here we create
+a small random lookup so the example is self-contained.
+
+```{r example-units}
+set.seed(1)
+unit_lookup <- data.frame(
+  fid  = data$mb$fid,
+  unit = sample(c("A", "B", "C"), nrow(data$mb), replace = TRUE)
+)
+
+units <- import_unit_assignments(unit_lookup)
+data  <- assign_units(data, units)
+```
+
+### Summarising the data
+
+With units attached, the `summarise_*()` functions return one row per unit.
+Each also reports how much data backs the figures, so a summary cannot quietly
+rest on missing or incomplete records.
+
+```{r example-summarise}
+# case composition per unit. n_*_missing report cases excluded from each
+# statistic (age, length of stay, sex); normally zero in ANQ data.
+summarise_composition(data)
+
+# HoNOS severity at admission per unit. prop_assessed is the share of cases
+# with a valid admission HoNOS; mean_items_rated and n_partial flag totals
+# built on incomplete item sets. Means/proportions for all 12 items are also
+# returned; a few shown here.
+sev <- summarise_honos_severity(data)
+sev[, c("unit", "n_cases", "prop_assessed", "h1_mean", "honos_total_mean")]
+```
+
+Unit occupancy expands each stay to hourly intervals over a calendar year.
+`occupancy_daily()` returns the daily census per unit (one row per unit and
+day), and `summarise_occupancy()` aggregates that to annual per-unit figures —
+estimated unit size, mean/max census, and occupancy rates. Cases dropped for
+missing fields or for not overlapping the year are reported via a message and
+the `"excluded"` attribute. The expansion can be slow on large datasets, so
+these are shown here but not run:
+
+```r
+# daily census per unit -- the basis for plotting occupancy over time
+occ <- occupancy_daily(data, year = 2023)
+head(occ$daily)            # unit, date, census, occ_rate
+occ$excluded               # how many cases were dropped, and why
+
+# annual per-unit summary
+result <- summarise_occupancy(data, year = 2023)
+result$by_unit
+result$excluded
+```
+
+### Synthetic data
+
+`sample_cases()` generates synthetic cases in the same structure as
+`import_anq()`, so you can develop and test against the full pipeline without
+real patient data. Unit assignments are attached separately, exactly as for
+real data.
 
 ```{r example-synthetic}
-# generate synthetic case data for testing and demonstration
-cases <- sample_cases(n = 200)
+sim <- sample_cases(n = 200)
 
+set.seed(1)
+lookup <- data.frame(
+  fid  = sim$mb$fid,
+  unit = sample(c("A", "B", "C"), nrow(sim$mb), replace = TRUE)
+)
+sim <- assign_units(sim, import_unit_assignments(lookup))
 
+summarise_composition(sim)
+```
+
+The probability arguments inject controlled messiness — dropouts, items coded
+9, missing discharge dates — which is useful for exercising the data-quality
+columns the summaries report:
+
+```{r example-synthetic-messy}
+messy <- sample_cases(
+  n = 200,
+  p_dropout_adm = 0.1,
+  p_item_na = 0.05,
+  p_missing_discharge = 0.08
+)
+
+messy_lookup <- data.frame(
+  fid  = messy$mb$fid,
+  unit = sample(c("A", "B", "C"), nrow(messy$mb), replace = TRUE)
+)
+messy <- assign_units(messy, import_unit_assignments(messy_lookup))
+
+summarise_honos_severity(messy)[, c("unit", "n_cases", "prop_assessed")]
 ```
 
 ## Data Format
@@ -112,3 +207,17 @@ The honupsy hex sticker features a Valais Blacknose Sheep
 (Walliser Schwarznasenschaf). These sheep are known for their exceptionally
 gentle and approachable nature and are used in animal-assisted therapy and
 support for children and adults with emotional or physical impairments.
+
+## Color Palette
+
+The color palette is based on the hex sticker.
+
+```{r}
+honupsy_cols <- c(
+  blue = "#517EA6",
+  sage = "#858B74",
+  ink = "#1A1E1F",
+  paper = "#FEF6EF",
+  ochre = "#DD9D46"
+)
+```

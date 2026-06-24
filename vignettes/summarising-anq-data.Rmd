@@ -1,0 +1,186 @@
+---
+title: "Summarising ANQ Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Summarising ANQ Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(honupsy)
+```
+
+## Overview
+
+The *Importing ANQ Data* vignette covers getting submission files into R. This
+one picks up from there and shows the descriptive `summarise_*()` functions:
+case composition, HoNOS symptom severity at admission, and unit occupancy.
+
+To keep the examples free of real patient data, we generate a synthetic cohort
+with `sample_cases()` and run the summaries over it. The functions behave
+exactly as they would on imported clinic data.
+
+## Why synthetic data
+
+`sample_cases()` does not fake the import structure. It writes valid ANQ raw
+records to a temporary file and reads them back through the same parser as
+`import_anq()`, so the result cannot drift from the real import format. That
+makes it suitable for examples, teaching, and tests without touching protected
+data.
+
+```{r generate}
+set.seed(1)
+
+data <- sample_cases(n = 1000)
+
+names(data)
+nrow(data$mb)
+```
+
+`sample_cases()` currently generates only MB (case-level data) and PH (HoNOS
+assessments).
+
+> **Note (MP).** `mp` is returned as an empty data frame. No summariser uses
+> the additional psychiatric data yet; this will change later.
+
+> **Note (FM).** `fm` is also empty, so there is no coercive-measures summary
+> in this vignette yet. Planned for a later version.
+
+## Attaching unit assignments
+
+The ANQ format carries no ward identifier, and the `summarise_*()` functions
+work per unit, so unit assignments must be attached first. Here we build a
+lookup table in memory; in practice it comes from a clinic export (see
+`import_unit_assignments()` in the import vignette).
+
+```{r assign-units}
+set.seed(1)
+
+lookup <- data.frame(
+  fid  = data$mb$fid,
+  unit = sample(c("Ward A", "Ward B", "Ward C"), nrow(data$mb), replace = TRUE)
+)
+
+data <- assign_units(data, import_unit_assignments(lookup))
+
+data$mb[1:5, c("fid", "unit", "main_diagnosis")]
+```
+
+## Case composition
+
+`summarise_composition()` returns one row per unit with case counts, mean age,
+mean length of stay, and the female proportion. The `n_*_missing` columns report
+how many cases were excluded from each statistic for missingness.
+
+```{r composition}
+summarise_composition(data)
+```
+
+`detail = "full"` adds the full distribution (median, SD, min, max, quartiles,
+IQR) for age and length of stay.
+
+```{r composition-full}
+summarise_composition(data, detail = "full")
+```
+
+## HoNOS severity at admission
+
+`summarise_honos_severity()` summarises admission HoNOS assessments (time point
+1, non-dropout) per unit: mean score per item, the proportion of severe cases
+per item (score > 2), and the mean total score.
+
+The leading columns are the data-quality guardrails. `prop_assessed` is the
+share of cases with a usable admission assessment, and `mean_items_rated` is the
+average number of the 12 items actually scored. Read the severity figures in
+light of these: a low `prop_assessed` means the means describe only part of the
+unit.
+
+```{r honos}
+honos <- summarise_honos_severity(data)
+
+# quality block plus the total score
+honos[, c("unit", "n_cases", "n_honos_adm", "prop_assessed",
+          "mean_items_rated", "n_partial", "honos_total_mean")]
+```
+
+The per-item means and severe proportions are in the remaining columns:
+
+```{r honos-items}
+honos[, c("unit", "h1_mean", "h2_mean", "h6_mean",
+          "h1_prop_severe", "h2_prop_severe", "h6_prop_severe")]
+```
+
+## Unit occupancy
+
+`summarise_occupancy()` gives annual per-unit occupancy: estimated unit size
+(1% rule), mean and maximum daily census, and the corresponding occupancy rates.
+It also reports how many cases were dropped, and why.
+
+```{r occupancy}
+occ <- summarise_occupancy(data, year = 2023)
+
+occ$by_unit
+
+occ$excluded
+```
+
+For the underlying daily series -- for example to plot occupancy over the year
+-- call `occupancy_daily()` directly. It returns the per-day census per unit.
+
+```{r occupancy-daily}
+daily <- occupancy_daily(data, year = 2023)
+
+head(daily$daily)
+daily$unit_size
+```
+
+## Exercising the data-quality columns
+
+On clean data the missingness and dropout columns stay near zero. Their purpose
+is visible only when the data are imperfect, which is the realistic case. The
+probability arguments to `sample_cases()` let you dial in dropouts, unrated
+items, and missing discharge dates.
+
+```{r messy}
+set.seed(2)
+
+messy <- sample_cases(
+  n = 1000,
+  p_dropout_adm       = 0.10,  # 10% of admission HoNOS are dropouts
+  p_item_na           = 0.05,  # 5% of rated items coded 9 (not known)
+  p_missing_discharge = 0.08   # 8% of cases lack a discharge date
+)
+
+messy_lookup <- data.frame(
+  fid  = messy$mb$fid,
+  unit = sample(c("Ward A", "Ward B", "Ward C"), nrow(messy$mb), replace = TRUE)
+)
+messy <- assign_units(messy, import_unit_assignments(messy_lookup))
+```
+
+The dropouts and unrated items now move `prop_assessed`, `mean_items_rated`, and
+`n_partial`:
+
+```{r messy-honos}
+summarise_honos_severity(messy)[, c("unit", "n_cases", "n_honos_adm",
+                                     "prop_assessed", "mean_items_rated",
+                                     "n_partial")]
+```
+
+The missing discharge dates show up in the occupancy exclusion tally:
+
+```{r messy-occupancy}
+summarise_occupancy(messy, year = 2023)$excluded
+```
+
+## Next steps
+
+These summaries operate on MB and PH. Summaries drawing on the additional
+psychiatric data (MP), the BSCL self-report (PB), and coercive measures (FM) are
+planned for later versions, at which point `sample_cases()` will generate those
+record types as well.

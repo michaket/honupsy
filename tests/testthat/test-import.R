@@ -231,3 +231,93 @@ test_that("import_anq correctly imports FM measures", {
   # physical restraint: 1100 to next day 0900 = 1320 minutes
   expect_equal(fm_case1$duration_min[2], 1320L)
 })
+
+# -- import_anq: unknown record types -----------------------------------------
+# Covers: setdiff(names(raw), known) -> message(... ignored ...)
+# example_unknown.txt is example.txt plus two "XX" rows (an unknown type).
+
+test_that("import_anq messages about ignored unknown record types", {
+  expect_message(
+    import_anq(example_path("example_unknown.txt"), validate = FALSE),
+    regexp = "ignored"
+  )
+})
+
+test_that("import_anq still parses known types when unknown ones are present", {
+  data <- suppressMessages(
+    import_anq(example_path("example_unknown.txt"), validate = FALSE)
+  )
+  expect_equal(nrow(data$mb), 3L)
+  # the unknown type does not leak into the result
+  expect_true(all(c("mb", "mp", "ph", "pb", "fm") %in% names(data)))
+  expect_false("xx" %in% names(data))
+})
+
+# -- import_anq: tab-delimited TXT --------------------------------------------
+# The docstring promises TAB / semicolon / pipe. example.txt is pipe-delimited
+# and example_semicolon.txt covers semicolon, so TAB is the untested delimiter.
+# example_tab.txt is example.txt with pipes replaced by tabs.
+
+test_that("import_anq imports a tab-delimited TXT file correctly", {
+  data <- import_anq(example_path("example_tab.txt"), validate = FALSE)
+  expect_equal(nrow(data$mb), 3L)
+  expect_equal(nrow(data$mp), 3L)
+  expect_equal(nrow(data$ph), 6L)
+})
+
+# -- import_anq: import summary message ---------------------------------------
+# Covers import_summary(), incl. the dropout / time_point counting arithmetic.
+# example.txt already contains a dropout (case 5050297), so the counts are
+# exercised, not just printed.
+
+test_that("import_anq prints a summary covering all record types", {
+  expect_message(
+    import_anq(example_path("example.txt"), validate = FALSE),
+    regexp = "ANQ import completed"
+  )
+  expect_message(
+    import_anq(example_path("example.txt"), validate = FALSE),
+    regexp = "MB: 3 cases"
+  )
+  # dropout arithmetic: PH line reports the known dropout
+  expect_message(
+    import_anq(example_path("example.txt"), validate = FALSE),
+    regexp = "PH: 6 assessments.*dropout"
+  )
+})
+
+# -- import_anq: empty frames have correct structure --------------------------
+# Covers the else empty_*() arms beyond nrow == 0: the docstring promises
+# "empty data.frames with the correct column types". Compare columns of an
+# absent type against the same type when populated.
+
+test_that("absent record types return empty frames with the right columns", {
+  full <- import_anq(example_path("example.txt"), validate = FALSE)
+  partial <- import_anq(
+    c(MB = example_path("example_mb.txt")),
+    validate = FALSE
+  )
+
+  for (type in c("mp", "ph", "pb", "fm")) {
+    expect_equal(nrow(partial[[type]]), 0L, info = type)
+    expect_identical(
+      names(partial[[type]]),
+      names(full[[type]]),
+      info = type
+    )
+  }
+})
+
+# -- import_anq: single named path routes through the multi reader ------------
+# c(MB = x) is length 1 but named, so the dispatch picks read_anq_multi,
+# not read_anq_raw. This arm is otherwise only hit by length >= 2 inputs.
+
+test_that("import_anq handles a single named path", {
+  data <- import_anq(
+    c(MB = example_path("example_mb.txt")),
+    validate = FALSE
+  )
+  expect_equal(nrow(data$mb), 3L)
+  expect_equal(nrow(data$mp), 0L)
+})
+

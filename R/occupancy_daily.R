@@ -101,7 +101,7 @@ occupancy_daily <- function(data, year) {
   hours_spine <- data.frame(
     date_hour = seq.POSIXt(start_yr, end_yr - 3600, by = "hour")
   )
-  hours_spine <- merge(hours_spine, units_df) # cross join
+  hours_spine <- merge(hours_spine, units_df) # cross join (no common column)
 
   # clip stays to the reference year and derive hourly bounds
   mb_clipped <- mb

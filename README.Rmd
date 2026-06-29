@@ -51,11 +51,8 @@ The package currently supports:
     occupancy at the unit level
 -   generating synthetic HoNOS case data for quick experimentation
 
-Future versions will add:
-
--   admission-to-discharge change scores (HoNOS and BSCL)
--   BSCL severity summaries at the unit level
--   estimation procedures for workload and staffing-related analyses
+Future versions will add estimation procedures for workload and staffing-
+related analyses.
 
 ## Installation
 
@@ -214,16 +211,3 @@ The honupsy hex sticker features a Valais Blacknose Sheep
 gentle and approachable nature and are used in animal-assisted therapy and
 support for children and adults with emotional or physical impairments.
 
-## Color Palette
-
-The color palette is based on the hex sticker.
-
-```{r}
-honupsy_cols <- c(
-  blue = "#517EA6",
-  sage = "#858B74",
-  ink = "#1A1E1F",
-  paper = "#FEF6EF",
-  ochre = "#DD9D46"
-)
-```

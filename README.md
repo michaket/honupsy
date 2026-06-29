@@ -41,11 +41,8 @@ The package currently supports:
   occupancy at the unit level
 - generating synthetic HoNOS case data for quick experimentation
 
-Future versions will add:
-
-- admission-to-discharge change scores (HoNOS and BSCL)
-- BSCL severity summaries at the unit level
-- estimation procedures for workload and staffing-related analyses
+Future versions will add estimation procedures for workload and
+staffing- related analyses.
 
 ## Installation
 
@@ -55,20 +52,19 @@ You can install the development version of honupsy from
 ``` r
 # install.packages("pak")
 pak::pak("michaket/honupsy")
-#> ✔ Updated metadata database: 7.84 MB in 4 files.
-#> ℹ Updating metadata database✔ Updating metadata database ... done
+#> ℹ Loading metadata database✔ Loading metadata database ... done
 #>  
 #> → Will update 1 package.
 #> → Will download 1 package with unknown size.
-#> + honupsy 0.0.0.9000 → 0.0.0.9000 👷🏻🔧 ⬇ (GitHub: faefb2e)
+#> + honupsy 0.0.0.9000 → 0.0.0.9000 👷🏼🔧 ⬇ (GitHub: 6ac396a)
 #> ℹ Getting 1 pkg with unknown size
 #> ✔ Got honupsy 0.0.0.9000 (source) (1.44 MB)
 #> ℹ Packaging honupsy 0.0.0.9000
-#> ✔ Packaged honupsy 0.0.0.9000 (1.8s)
+#> ✔ Packaged honupsy 0.0.0.9000 (1.3s)
 #> ℹ Building honupsy 0.0.0.9000
-#> ✔ Built honupsy 0.0.0.9000 (2.8s)
-#> ✔ Installed honupsy 0.0.0.9000 (github::michaket/honupsy@faefb2e) (89ms)
-#> ✔ 1 pkg + 19 deps: kept 18, upd 1, dld 1 (NA B) [33.8s]
+#> ✔ Built honupsy 0.0.0.9000 (3s)
+#> ✔ Installed honupsy 0.0.0.9000 (github::michaket/honupsy@6ac396a) (70ms)
+#> ✔ 1 pkg + 19 deps: kept 18, upd 1, dld 1 (NA B) [20.4s]
 ```
 
 ## Examples
@@ -271,17 +267,3 @@ The honupsy hex sticker features a Valais Blacknose Sheep (Walliser
 Schwarznasenschaf). These sheep are known for their exceptionally gentle
 and approachable nature and are used in animal-assisted therapy and
 support for children and adults with emotional or physical impairments.
-
-## Color Palette
-
-The color palette is based on the hex sticker.
-
-``` r
-honupsy_cols <- c(
-  blue = "#517EA6",
-  sage = "#858B74",
-  ink = "#1A1E1F",
-  paper = "#FEF6EF",
-  ochre = "#DD9D46"
-)
-```

@@ -61,7 +61,7 @@ parse_int <- function(x) {
 }
 
 #' Labels for coercive measure types
-#' Codes as defined in ANQ data definition appendix A7 (valid from 01.01.2021)
+#' Codes as defined in ANQ data-definition appendix A7 (valid from 01.01.2021)
 #' @noRd
 coercive_measure_label <- function(code) {
   labels <- c(

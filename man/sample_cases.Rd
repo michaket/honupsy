@@ -54,8 +54,8 @@ real parser and cannot drift from it. In this version only MB and PH are
 generated; \code{mp}, \code{pb} and \code{fm} are returned as empty data
 frames, as they would be for an import that lacked those record types.
 
-Unit (ward) assignments are deliberately \emph{not} included, mirroring real
-ANQ data: attach them afterwards with \code{\link{import_unit_assignments}}
+Unit (ward) assignments are deliberately \emph{not} included, mirroring
+a real ANQ submission: attach them afterwards with \code{\link{import_unit_assignments}}
 and \code{\link{assign_units}} before calling the \code{summarise_*()}
 functions.
 

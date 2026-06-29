@@ -1,8 +1,8 @@
 ---
-title: "Importing ANQ Data"
+title: "Importing Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Importing ANQ Data}
+  %\VignetteIndexEntry{Importing Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,52 +17,61 @@ library(honupsy)
 
 ## Overview
 
-The honupsy package provides tools to import, validate and analyse data from
-the Swiss national quality measurement programme in inpatient psychiatry
-(Nationale Qualitätsmessung stationäre Psychiatrie, ANQ).
+The honupsy package imports, validates and summarises data from the Swiss
+national quality measurement in adult inpatient psychiatry, coordinated by the
+ANQ (Nationaler Verein für Qualitätsentwicklung in Spitälern und Kliniken).
 
 This vignette covers the import step. All other analyses in the package build
 on the data structures produced here, so it is worth reading even if the
 technical details of file formats are not your main interest.
 
-## No additional data preparation required
+## Works directly with submission files
 
-Swiss psychiatric clinics are required by law to collect and submit ANQ data
+Swiss psychiatric clinics are required by law to collect and submit these data
 annually. The data are submitted in a defined format -- either as text files
-or using the official ANQ data entry template (an Excel file provided by ANQ).
+or using the official ANQ data-entry template (an Excel file provided by ANQ).
 
 **honupsy works directly with these submission files.** There is no need to
 reformat or restructure your data before importing. The same files you send
 to ANQ can be loaded straight into R.
 
+Importing needs nothing further, but the analysis does: the `summarise_*()`
+functions operate per unit (ward), and the ANQ format carries no unit
+identifier. Unit assignment is therefore a required preparation step before any
+summary -- you supply it separately, see
+[Adding unit assignments](#adding-unit-assignments) below.
+
 ## What data are imported
 
-The ANQ measurement for adult inpatient psychiatry consists of five record
-types:
+The ANQ submission for adult inpatient psychiatry consists of five record
+types, spanning two layers: the administrative case data drawn from the BFS
+Medical Statistics (Medizinische Statistik der Krankenhäuser, collected by the
+Bundesamt für Statistik, BFS), and the ANQ measurement instruments collected
+on top of it.
 
-| Record type | Content |
-|---|---|
-| MB | Minimal dataset (administrative and clinical data per case) |
-| MP | Additional psychiatric data per case |
-| PH | HoNOS symptom burden assessment at admission and discharge |
-| PB | BSCL patient self-report at admission and discharge |
-| FM | Coercive measures during inpatient stay |
+| Record type | Content | Layer |
+|---|---|---|
+| MB | Minimal dataset (administrative and clinical case data) | BFS Medical Statistics |
+| MP | Additional psychiatric case data | BFS Medical Statistics |
+| PH | HoNOS symptom burden at admission and discharge | ANQ measurement |
+| PB | BSCL patient self-report at admission and discharge | ANQ measurement |
+| FM | Coercive measures during inpatient stay | ANQ measurement |
 
-`import_anq()` imports all five record types and returns them as a named list
-of data frames, one per record type.
+The record types are linked by the case identifier (FID), present in every row.
+`import_anq()` imports all five and returns them as a named list of data
+frames, one per record type.
 
 ## Supported file formats
 
 honupsy supports three file formats:
 
 **Text files** (`.txt`) with pipe (`|`), semicolon (`;`) or tab as delimiter --
-the format used for the mandatory ANQ submission to the Federal Statistical
-Office (BFS).
+the delimited export format of the ANQ submission.
 
 **Simple XLSX** with one worksheet per record type, named MB, MP, PH, PB
 and FM.
 
-**The official ANQ data entry template** -- the Excel file provided by ANQ
+**The official ANQ data-entry template** -- the Excel file provided by ANQ
 for manual data entry. honupsy automatically recognises this file by its
 worksheet names and handles the multi-row header structure.
 
@@ -74,7 +83,7 @@ library(honupsy)
 # import from a single mixed text file
 data <- import_anq("path/to/data.txt")
 
-# import from the official ANQ data entry template
+# import from the official ANQ data-entry template
 data <- import_anq("path/to/ANQ_PSY_EP_Dateneingabe_Messjahr-2024.xlsx")
 
 # import from separate files per record type
@@ -140,19 +149,19 @@ with tidyverse packages.
 A few selected columns to illustrate the structure:
 
 ```{r}
-# MB: administrative and clinical data
+# MB: BFS case data (administrative and clinical)
 data$mb[, c("fid", "sex", "age_admission", "main_diagnosis",
             "admission", "discharge")]
 ```
 
 ```{r}
-# PH: HoNOS assessments
+# PH: ANQ measurement (HoNOS assessments)
 data$ph[, c("fid", "time_point_label", "is_dropout",
             "honos_total", "honos_n_valid")]
 ```
 
 ```{r}
-# FM: coercive measures
+# FM: ANQ measurement (coercive measures)
 data$fm[, c("fid", "measure_label", "start_date",
             "duration_min", "is_coercive_medication")]
 ```
@@ -183,11 +192,10 @@ data <- import_anq("path/to/data.txt", validate = FALSE)
 
 ## A note on PB (BSCL)
 
-The BSCL patient self-report (PB) is not collected by all clinics. Forensic
-psychiatric institutions have been exempt from this measurement since
-1 July 2019. If your data do not contain PB records, `data$pb` will be an
-empty data frame -- this is expected and does not trigger a validation
-warning.
+The BSCL patient self-report (PB) is not collected by all clinics. Forensic and
+old-age psychiatry units are exempt from this measurement. If your data do not
+contain PB records, `data$pb` will be an empty data frame -- this is expected
+and does not trigger a validation warning.
 
 ## Adding unit assignments
 
@@ -214,7 +222,7 @@ units <- import_unit_assignments(
 units
 ```
 
-Attach the unit assignments to the imported ANQ data:
+Attach the unit assignments to the imported data:
 
 ```{r assign-units}
 data <- assign_units(data, units)
@@ -229,6 +237,16 @@ data$ph[, c("fid", "unit", "time_point_label", "honos_total")]
 
 If a patient transferred between units during their stay, we recommend using
 the unit the patient was on immediately before discharge.
+
+## Scope and versions
+
+honupsy covers adult inpatient psychiatry (Erwachsenenpsychiatrie). The child
+and adolescent instruments (HoNOSCA, HoNOSCA-SR) are out of scope.
+
+The data definition has changed across measurement years. From measurement
+year 2026 the case definition adopts case merging, and SpiGes replaces the
+former Medical Statistics. If you work with recent data, check your files
+against the data definition for the relevant measurement year.
 
 ## Next steps
 

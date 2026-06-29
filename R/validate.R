@@ -1,4 +1,4 @@
-#' Validate an ANQ dataset
+#' Validate an imported ANQ submission
 #' @param data named list with mb, mp, ph, pb, fm data.frames
 #' @return invisibly a named list of validation messages per section,
 #'         warnings are also issued

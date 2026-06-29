@@ -23,21 +23,27 @@ knitr::opts_chunk$set(
 The goal of honupsy is to provide tools for working with routinely collected
 inpatient psychiatric data, with a particular focus on the Health of the Nation
 Outcome Scales (HoNOS) and unit-level indicators relevant to nursing workload
-and patient composition.
+and patient composition. The name combines its three concerns: **HO**NOS,
+**NU**rsing, **PSY**chiatry.
 
 The package is built around the data infrastructure of the Swiss national
-quality measurement programme in inpatient psychiatry, coordinated by
-[ANQ](https://www.anq.ch). Participating clinics are required by law to
-collect and submit these data to ANQ. honupsy allows clinics and researchers
-to work with these data directly in R, without any additional data preparation
-steps.
+quality measurement in inpatient psychiatry, coordinated by
+[ANQ](https://www.anq.ch). Each clinic's submission combines two layers: the
+administrative case data of the BFS Medical Statistics (collected by the
+Bundesamt für Statistik, BFS), and the ANQ measurement instruments layered on
+top -- HoNOS, BSCL, and coercive measures. Clinics are required by law to
+collect and submit these data; honupsy loads the submission files directly in
+R, without reformatting. Unit-level summaries additionally require unit (ward)
+assignments, which the ANQ format does not carry and which you attach
+separately.
 
 The package currently supports:
 
--   importing ANQ data in all standard submission formats (TXT with pipe,
-    semicolon or tab delimiter; XLSX; official ANQ data entry template)
--   parsing all relevant record types: MB (minimal dataset), MP (psychiatry
-    supplementary data), PH (HoNOS), PB (BSCL), and FM (coercive measures)
+-   importing ANQ submission files in all standard formats (TXT with pipe,
+    semicolon or tab delimiter; XLSX; official ANQ data-entry template)
+-   parsing all relevant record types: the BFS case data (MB, minimal dataset;
+    MP, psychiatry supplement) and the ANQ instruments (PH, HoNOS; PB, BSCL;
+    FM, coercive measures)
 -   validating imported data for completeness and plausibility
 -   computing HoNOS total scores and handling missing or not-applicable items
 -   attaching user-supplied unit (ward) assignments to imported data
@@ -63,7 +69,7 @@ pak::pak("michaket/honupsy")
 
 ## Examples
 
-### Importing ANQ data
+### Importing an ANQ submission
 
 ```{r example-import}
 library(honupsy)
@@ -116,7 +122,7 @@ rest on missing or incomplete records.
 
 ```{r example-summarise}
 # case composition per unit. n_*_missing report cases excluded from each
-# statistic (age, length of stay, sex); normally zero in ANQ data.
+# statistic (age, length of stay, sex); normally zero in the imported data.
 summarise_composition(data)
 
 # HoNOS severity at admission per unit. prop_assessed is the share of cases
@@ -190,13 +196,13 @@ summarise_honos_severity(messy)[, c("unit", "n_cases", "prop_assessed")]
 
 ## Data Format
 
-honupsy works with the standard ANQ data submission format. No reformatting
+honupsy works with the standard ANQ submission format. No reformatting
 is required: the same files your clinic prepares for submission to ANQ can
 be loaded directly into R with `import_anq()`. Supported formats are:
 
 - Pipe-, semicolon- or tab-delimited TXT files
 - XLSX files with one worksheet per record type
-- The official ANQ data entry template (Excel)
+- The official ANQ data-entry template (Excel)
 
 Both single mixed files (all record types in one file) and separate files
 per record type are supported.

@@ -128,10 +128,10 @@ import_unit_assignments <- function(
   result
 }
 
-#' Attach unit assignments to imported ANQ data
+#' Attach unit assignments to an imported ANQ submission
 #'
 #' Joins a unit lookup table (from \code{\link{import_unit_assignments}})
-#' onto the relevant datasets in an imported ANQ data list. A \code{unit}
+#' onto the relevant datasets in an imported ANQ submission. A \code{unit}
 #' column is added to \code{mb}, \code{ph}, \code{pb}, and \code{fm}.
 #'
 #' @param data named list. Output of \code{\link{import_anq}}.
@@ -172,7 +172,7 @@ assign_units <- function(data, units) {
     )
   }
 
-  # warn about FIDs in ANQ data without a unit assignment
+  # warn about FIDs in the data without a unit assignment
   if (nrow(data$mb) > 0) {
     fid_mb <- unique(data$mb$fid)
     fid_units <- unique(units$fid)
@@ -180,18 +180,18 @@ assign_units <- function(data, units) {
     if (length(unmatched) > 0) {
       warning(
         length(unmatched),
-        " FID(s) in ANQ data have no unit assignment. ",
+        " FID(s) in the imported data have no unit assignment. ",
         "These cases will have unit = NA: ",
         paste(head(unmatched, 5), collapse = ", "),
         call. = FALSE
       )
     }
-    # warn about unit assignments for FIDs not in ANQ data
+    # warn about unit assignments for FIDs not in the data
     extra <- setdiff(fid_units, fid_mb)
     if (length(extra) > 0) {
       warning(
         length(extra),
-        " FID(s) in unit assignments not found in ANQ data.",
+        " FID(s) in unit assignments not found in the imported data.",
         call. = FALSE
       )
     }

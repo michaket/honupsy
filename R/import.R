@@ -1,6 +1,6 @@
-#' Import ANQ data
+#' Import an ANQ submission
 #'
-#' Reads ANQ data for the national quality measurement in inpatient adult
+#' Reads an ANQ submission for the national quality measurement in inpatient adult
 #' psychiatry. Supports TXT (with TAB, semicolon or pipe as delimiter) and
 #' XLSX, either as a single mixed file or as separate files per record type.
 #'

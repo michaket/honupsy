@@ -2,7 +2,7 @@
 % Please edit documentation in R/units.R
 \name{assign_units}
 \alias{assign_units}
-\title{Attach unit assignments to imported ANQ data}
+\title{Attach unit assignments to an imported ANQ submission}
 \usage{
 assign_units(data, units)
 }
@@ -18,7 +18,7 @@ The input \code{data} list with a \code{unit} column added to
 }
 \description{
 Joins a unit lookup table (from \code{\link{import_unit_assignments}})
-onto the relevant datasets in an imported ANQ data list. A \code{unit}
+onto the relevant datasets in an imported ANQ submission. A \code{unit}
 column is added to \code{mb}, \code{ph}, \code{pb}, and \code{fm}.
 }
 \examples{

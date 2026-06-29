@@ -131,7 +131,7 @@ read_anq_multi <- function(paths) {
 }
 
 
-# Sheet names of the official ANQ data entry template
+# Sheet names of the official ANQ data-entry template
 ANQ_TEMPLATE_SHEETS <- c(
   "MB - Minimales Datenset" = "MB",
   "MP - Psychiatrie Zusatzdaten" = "MP",
@@ -140,7 +140,7 @@ ANQ_TEMPLATE_SHEETS <- c(
   "FM - Freiheitsbeschr\u00e4nkende M" = "FM"
 )
 
-#' Check whether an XLSX file is the official ANQ data entry template
+#' Check whether an XLSX file is the official ANQ data-entry template
 #' Detected by presence of at least one sheet with the expected full name
 #' @param path path to the xlsx file
 #' @return logical
@@ -150,7 +150,7 @@ is_anq_template <- function(path) {
   any(sheets %in% names(ANQ_TEMPLATE_SHEETS))
 }
 
-#' Read the official ANQ data entry template
+#' Read the official ANQ data-entry template
 #' Handles the multi-row header structure and locates data via the
 #' "Ab hier Eingabe" marker row
 #' @param path path to the xlsx file

@@ -2,7 +2,7 @@
 % Please edit documentation in R/import.R
 \name{import_anq}
 \alias{import_anq}
-\title{Import ANQ data}
+\title{Import an ANQ submission}
 \usage{
 import_anq(path, validate = TRUE)
 }
@@ -24,7 +24,7 @@ in the input are returned as empty data.frames with the correct column
 types.
 }
 \description{
-Reads ANQ data for the national quality measurement in inpatient adult
+Reads an ANQ submission for the national quality measurement in inpatient adult
 psychiatry. Supports TXT (with TAB, semicolon or pipe as delimiter) and
 XLSX, either as a single mixed file or as separate files per record type.
 }

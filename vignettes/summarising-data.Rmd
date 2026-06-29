@@ -1,8 +1,8 @@
 ---
-title: "Summarising ANQ Data"
+title: "Summarising Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Summarising ANQ Data}
+  %\VignetteIndexEntry{Summarising Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,7 @@ library(honupsy)
 
 ## Overview
 
-The *Importing ANQ Data* vignette covers getting submission files into R. This
+The *Importing Data* vignette covers getting submission files into R. This
 one picks up from there and shows the descriptive `summarise_*()` functions:
 case composition, HoNOS symptom severity at admission, and unit occupancy.
 
@@ -73,9 +73,10 @@ data$mb[1:5, c("fid", "unit", "main_diagnosis")]
 
 ## Case composition
 
-`summarise_composition()` returns one row per unit with case counts, mean age,
-mean length of stay, and the female proportion. The `n_*_missing` columns report
-how many cases were excluded from each statistic for missingness.
+`summarise_composition()` summarises the BFS case layer (MB). It returns one row
+per unit with case counts, mean age, mean length of stay, and the female
+proportion. The `n_*_missing` columns report how many cases were excluded from
+each statistic for missingness.
 
 ```{r composition}
 summarise_composition(data)
@@ -90,9 +91,10 @@ summarise_composition(data, detail = "full")
 
 ## HoNOS severity at admission
 
-`summarise_honos_severity()` summarises admission HoNOS assessments (time point
-1, non-dropout) per unit: mean score per item, the proportion of severe cases
-per item (score > 2), and the mean total score.
+`summarise_honos_severity()` summarises the ANQ measurement layer (PH):
+admission HoNOS assessments (time point 1, non-dropout) per unit -- mean score
+per item, the proportion of severe cases per item (score > 2), and the mean
+total score.
 
 The leading columns are the data-quality guardrails. `prop_assessed` is the
 share of cases with a usable admission assessment, and `mean_items_rated` is the

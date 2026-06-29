@@ -237,10 +237,10 @@ test_that("assign_units sets unit to NA for unmatched FIDs and warns", {
   ))
 })
 
-test_that("assign_units warns about unit FIDs not in ANQ data", {
+test_that("assign_units warns about unit FIDs not in the imported data", {
   data <- import_anq(example_path("example.txt"), validate = FALSE)
   units <- import_unit_assignments(example_path("example_units.csv"))
-  # add an extra FID not in ANQ data
+  # add an extra FID not in the imported data
   units <- rbind(
     units,
     data.frame(fid = "9999999", unit = "C3", stringsAsFactors = FALSE)
@@ -248,7 +248,7 @@ test_that("assign_units warns about unit FIDs not in ANQ data", {
 
   expect_warning(
     assign_units(data, units),
-    regexp = "not found in ANQ data"
+    regexp = "not found in the imported data"
   )
 })
 

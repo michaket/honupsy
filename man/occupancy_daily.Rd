@@ -30,12 +30,17 @@ This is the shared computational core used by \code{\link{summarise_occupancy}}
 and is the natural input for plotting occupancy over time.
 }
 \details{
-Unit size is estimated from the data using the 1\\% rule: the largest
-occupancy level observed during at least 1\\% of all hours in the year
-(88 hours). The hourly census follows a right-open convention: a patient is
-counted in hour \code{h} if \code{admission < h + 1} and \code{discharge > h}.
-Each daily \code{census} is the mean of the 24 hourly counts for that day, so
-it is an average daily census rather than a snapshot.
+Unit size is estimated from the hourly occupancy profile as the largest
+exact patient count that occurs for more than 88 hours in the reference
+year, reproducing the operational definition used in the associated study.
+
+Hourly occupancy uses strict admission and discharge boundaries: a patient
+is counted at hour \code{h} if \code{admission < h} and
+\code{discharge > h}. For example, a stay recorded from 10:00 to 12:00
+contributes to the 11:00 count, but not to the 10:00 or 12:00 counts.
+
+Each daily \code{census} is the mean of the hourly occupancy counts for that
+day, so it represents an average daily census rather than a single snapshot.
 
 Days on which a unit held no patients are present with \code{census = 0}, so
 the series is gap-free across the year. Occupancy rate may legitimately

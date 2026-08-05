@@ -26,10 +26,14 @@ units with no admission assessment.
 i.e. assessments whose total is summed over an incomplete item set.
 \item \code{h1_mean}, ..., \code{h12_mean}: mean score per HoNOS item at admission
 (9s excluded).
-\item \code{h1_prop_severe}, ..., \code{h12_prop_severe}: proportion of cases with a
-severe score (> 2) per item. Missing and 9-coded values count as
-non-severe.
-\item \code{honos_total_mean}: mean total HoNOS score at admission.
+\item \code{h1_prop_severe}, ..., \code{h12_prop_severe}: proportion of all cases
+assigned to the unit with a severe admission score (3 or 4) on the
+respective item. Cases without a non-dropout admission HoNOS
+assessment and missing or 9-coded item values count as non-severe.
+\item \code{honos_total_mean}: mean admission HoNOS total, where each patient's
+total is the sum of available item scores. Missing and 9-coded items
+are omitted rather than prorated to 12 items. Assessments with no
+valid HoNOS items do not contribute to the mean.
 }
 }
 \description{
@@ -39,15 +43,24 @@ data-quality counts, mean item scores, proportion of severe cases per item
 (score > 2), and mean total score.
 }
 \details{
-Item values of 9 ("not known / not applicable") are treated as missing and
-excluded from means. When computing the severe indicator, missing values
-(including 9s) are treated as non-severe (0), so that missingness does not
-inflate severity proportions.
+HoNOS item scores of 3 or 4 are classified as severe. Severe-item
+proportions use all cases in the MB dataset assigned to the respective
+unit as the denominator, reproducing the operationalisation used in the
+associated study. Cases without a non-dropout admission HoNOS assessment,
+and individual items that are missing or coded 9, are classified as
+non-severe for these proportions. Missing values are excluded when
+calculating item means.
+
+Item means and severe-item proportions therefore use different
+missing-data rules: item means are based on observed ratings, whereas
+severe-item proportions use all cases assigned to the unit as their
+denominator.
 
 The input must be the output of \code{\link{import_anq}} after unit
 assignments have been attached with \code{\link{assign_units}}. Cases
-without a unit assignment or without an admission HoNOS assessment are
-included in \code{n_cases} but contribute \code{NA} to the HoNOS means.
+without an admission HoNOS assessment remain included in
+\code{n_cases} and in the denominator of the severe-item proportions, but
+do not contribute to HoNOS item means or total-score summaries.
 }
 \examples{
 \dontrun{

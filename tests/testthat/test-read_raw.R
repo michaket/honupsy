@@ -200,3 +200,22 @@ test_that("read_anq_template and read_txt_raw produce same FIDs", {
 
   expect_equal(sort(fid_template), sort(fid_txt))
 })
+
+
+test_that("read_txt_raw preserves a trailing empty field", {
+  tmp <- tempfile(fileext = ".txt")
+
+  writeLines(
+    "PH|A|B|C|",
+    tmp
+  )
+
+  result <- read_txt_raw(tmp)
+
+  expect_equal(
+    result$PH[[1]],
+    c("PH", "A", "B", "C", "")
+  )
+
+  unlink(tmp)
+})

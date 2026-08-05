@@ -30,7 +30,15 @@ read_txt_raw <- function(path) {
   delim <- detect_delimiter(lines)
   sep <- switch(delim, pipe = "|", semicolon = ";", tab = "\t")
 
-  records <- strsplit(lines, split = sep, fixed = TRUE)
+  records <- lapply(lines, function(line) {
+    fields <- strsplit(
+      paste0(line, sep, "__HONUPSY_END__"),
+      split = sep,
+      fixed = TRUE
+    )[[1]]
+
+    fields[-length(fields)]
+  })
   types <- vapply(records, `[[`, character(1), 1)
   split(records, types)
 }

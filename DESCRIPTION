@@ -4,7 +4,10 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Michael", "Ketzer", , "michael.ketzer@unibas.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9633-3947"))
-Description: Provides functions to import and summarise data from the Swiss national quality measurement in adult inpatient psychiatry. Descriptive summaries cover unit-level patient composition, symptom severity based on the Health of the Nation Outcome Scales (HoNOS), and unit occupancy, to support analyses of how patient composition relates to nurse staffing and workload.
+Description: Provides functions to import, validate, and summarise data
+    from the Swiss national quality measurement in adult inpatient
+    psychiatry, implemented against the ANQ data definition for
+    measurement year 2022 (MB, MP, PH, PB, and FM records).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

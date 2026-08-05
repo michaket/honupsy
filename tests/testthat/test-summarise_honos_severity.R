@@ -74,3 +74,64 @@ test_that("item means and severe proportions are in range", {
   expect_true(all(means >= 0 & means <= 4, na.rm = TRUE))
   expect_true(all(props >= 0 & props <= 1, na.rm = TRUE))
 })
+
+
+test_that("severe proportions use all MB cases as denominator", {
+  d <- sim_units(3, units = "A")
+
+  adm <- which(
+    d$ph$time_point == 1L &
+      !d$ph$is_dropout
+  )
+
+  # Of the two patients with an admission HoNOS:
+  # one is severe and one is non-severe.
+  d$ph$h1_aggression[adm] <- c(3L, 0L, 4L)
+
+  # Remove the admission HoNOS entirely for the third patient.
+  # Under the study operationalisation this patient remains
+  # in the denominator and counts as non-severe.
+  d$ph <- d$ph[-adm[3], ]
+
+  sev <- summarise_honos_severity(d)
+
+  expect_equal(sev$h1_prop_severe, 1 / 3)
+
+  # Means remain based on observed ratings only.
+  expect_equal(sev$h1_mean, mean(c(3, 0)))
+})
+
+test_that("missing HoNOS items count as non-severe but not in item means", {
+  d <- sim_units(3, units = "A")
+
+  adm <- which(
+    d$ph$time_point == 1L &
+      !d$ph$is_dropout
+  )
+
+  d$ph$h1_aggression[adm] <- c(3L, NA_integer_, 0L)
+
+  sev <- summarise_honos_severity(d)
+
+  # 1 severe case among all 3 cases
+  expect_equal(sev$h1_prop_severe, 1 / 3)
+
+  # But the missing item is not imputed as zero for the item mean
+  expect_equal(sev$h1_mean, mean(c(3, 0)))
+})
+
+test_that("admission HoNOS dropout remains in severe denominator", {
+  d <- sim_units(3, units = "A")
+
+  adm <- which(d$ph$time_point == 1L)
+
+  d$ph$h1_aggression[adm] <- c(3L, 0L, 4L)
+
+  # Make third admission assessment a dropout
+  d$ph$is_dropout[adm[3]] <- TRUE
+  d$ph$dropout_code[adm[3]] <- 2L
+
+  sev <- summarise_honos_severity(d)
+
+  expect_equal(sev$h1_prop_severe, 1 / 3)
+})

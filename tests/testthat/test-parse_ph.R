@@ -486,3 +486,88 @@ test_that("empty_ph returns a data frame with zero rows and correct types", {
   expect_type(result$honos_total, "integer")
   expect_type(result$honos_n_valid, "integer")
 })
+
+
+test_that("PH row with blank final H12 preserves earlier HoNOS items", {
+  tmp <- tempfile(fileext = ".txt")
+
+  writeLines(
+    paste(
+      c(
+        "PH",
+        "12345678",
+        "5050286",
+        "1",
+        "0",
+        "",
+        "20120730",
+        "2", # h1
+        "4", # h2
+        "4", # h3
+        "1", # h4
+        "2", # h5
+        "1", # h6
+        "4", # h7
+        "1", # h8
+        "a",
+        "",
+        "1", # h9
+        "3", # h10
+        "4", # h11
+        "" # h12 genuinely missing
+      ),
+      collapse = "|"
+    ),
+    tmp
+  )
+
+  raw <- read_txt_raw(tmp)
+  result <- parse_ph(raw$PH)
+
+  expect_equal(nrow(result), 1L)
+  expect_equal(result$h1_aggression, 2L)
+  expect_equal(result$h11_living_conditions, 4L)
+  expect_true(is.na(result$h12_occupation))
+  expect_equal(result$honos_n_valid, 11L)
+
+  unlink(tmp)
+})
+
+
+test_that("HoNOS total sums available items without prorating", {
+  x <- honos_total_score(
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    3L,
+    NA_integer_
+  )
+
+  expect_equal(x$n_valid, 11L)
+  expect_equal(x$total, 33L)
+
+  y <- honos_total_score(
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_
+  )
+
+  expect_equal(y$n_valid, 0L)
+  expect_true(is.na(y$total))
+})

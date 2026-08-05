@@ -204,10 +204,16 @@ be loaded directly into R with `import_anq()`. Supported formats are:
 Both single mixed files (all record types in one file) and separate files
 per record type are supported.
 
+## Scope
+
+honupsy 0.1.0 implements the ANQ adult inpatient psychiatry data format for 
+measurement year 2022, including MB, MP, PH, PB, and FM records. Compatibility 
+with other measurement years is not guaranteed. The SpiGes-based format 
+introduced from measurement year 2026 is not supported.
+
 ## About the Hex Sticker
 
 The honupsy hex sticker features a Valais Blacknose Sheep
 (Walliser Schwarznasenschaf). These sheep are known for their exceptionally
 gentle and approachable nature and are used in animal-assisted therapy and
 support for children and adults with emotional or physical impairments.
-

@@ -485,3 +485,28 @@ test_that("empty_mb returns a data frame with zero rows and correct types", {
   expect_s3_class(result$admission, "POSIXct")
   expect_s3_class(result$discharge, "POSIXct")
 })
+
+
+test_that("MB row with blank final PID is preserved", {
+  tmp <- tempfile(fileext = ".txt")
+
+  fields <- rep("", 52)
+  fields[1] <- "MB"
+  fields[2] <- "12345678"
+  fields[51] <- "FID001"
+  fields[52] <- ""
+
+  writeLines(
+    paste(fields, collapse = "|"),
+    tmp
+  )
+
+  raw <- read_txt_raw(tmp)
+  result <- parse_mb(raw$MB)
+
+  expect_equal(nrow(result), 1L)
+  expect_equal(result$fid, "FID001")
+  expect_equal(result$pid, "")
+
+  unlink(tmp)
+})

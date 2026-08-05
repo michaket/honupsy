@@ -54,17 +54,8 @@ You can install the development version of honupsy from
 pak::pak("michaket/honupsy")
 #> ℹ Loading metadata database✔ Loading metadata database ... done
 #>  
-#> → Will update 1 package.
-#> → Will download 1 package with unknown size.
-#> + honupsy 0.0.0.9000 → 0.0.0.9000 👷🏼🔧 ⬇ (GitHub: 6ac396a)
-#> ℹ Getting 1 pkg with unknown size
-#> ✔ Got honupsy 0.0.0.9000 (source) (1.44 MB)
-#> ℹ Packaging honupsy 0.0.0.9000
-#> ✔ Packaged honupsy 0.0.0.9000 (1.3s)
-#> ℹ Building honupsy 0.0.0.9000
-#> ✔ Built honupsy 0.0.0.9000 (3s)
-#> ✔ Installed honupsy 0.0.0.9000 (github::michaket/honupsy@6ac396a) (70ms)
-#> ✔ 1 pkg + 19 deps: kept 18, upd 1, dld 1 (NA B) [20.4s]
+#> ℹ No downloads are needed
+#> ✔ 1 pkg + 19 deps: kept 18 [5.8s]
 ```
 
 ## Examples
@@ -260,6 +251,14 @@ are:
 
 Both single mixed files (all record types in one file) and separate
 files per record type are supported.
+
+## Scope
+
+honupsy 0.1.0 implements the ANQ adult inpatient psychiatry data format
+for measurement year 2022, including MB, MP, PH, PB, and FM records.
+Compatibility with other measurement years is not guaranteed. The
+SpiGes-based format introduced from measurement year 2026 is not
+supported.
 
 ## About the Hex Sticker
 

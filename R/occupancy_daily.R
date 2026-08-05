@@ -5,12 +5,17 @@
 #' This is the shared computational core used by \code{\link{summarise_occupancy}}
 #' and is the natural input for plotting occupancy over time.
 #'
-#' Unit size is estimated from the data using the 1\% rule: the largest
-#' occupancy level observed during at least 1\% of all hours in the year
-#' (88 hours). The hourly census follows a right-open convention: a patient is
-#' counted in hour \code{h} if \code{admission < h + 1} and \code{discharge > h}.
-#' Each daily \code{census} is the mean of the 24 hourly counts for that day, so
-#' it is an average daily census rather than a snapshot.
+#' Unit size is estimated from the hourly occupancy profile as the largest
+#' exact patient count that occurs for more than 88 hours in the reference
+#' year, reproducing the operational definition used in the associated study.
+#'
+#' Hourly occupancy uses strict admission and discharge boundaries: a patient
+#' is counted at hour \code{h} if \code{admission < h} and
+#' \code{discharge > h}. For example, a stay recorded from 10:00 to 12:00
+#' contributes to the 11:00 count, but not to the 10:00 or 12:00 counts.
+#'
+#' Each daily \code{census} is the mean of the hourly occupancy counts for that
+#' day, so it represents an average daily census rather than a single snapshot.
 #'
 #' Days on which a unit held no patients are present with \code{census = 0}, so
 #' the series is gap-free across the year. Occupancy rate may legitimately
@@ -81,6 +86,17 @@ occupancy_daily <- function(data, year) {
     )
   }
 
+  invalid_interval <- mb$discharge < mb$admission
+
+  if (any(invalid_interval)) {
+    stop(
+      "Discharge precedes admission for ",
+      sum(invalid_interval),
+      " case(s). Occupancy cannot be calculated.",
+      call. = FALSE
+    )
+  }
+
   # period boundaries -- built in the data's own timezone so that the hourly
   # spine and the admission/discharge comparisons share a tzone (otherwise
   # pmax/pmin warn about inconsistent 'tzone' attributes)
@@ -90,18 +106,6 @@ occupancy_daily <- function(data, year) {
   }
   start_yr <- as.POSIXct(paste0(year, "-01-01 00:00:00"), tz = tz)
   end_yr <- as.POSIXct(paste0(year + 1L, "-01-01 00:00:00"), tz = tz)
-
-  # one row per unit
-  units_df <- data.frame(
-    unit = sort(unique(mb$unit)),
-    stringsAsFactors = FALSE
-  )
-
-  # full hourly spine: every hour of the year x every unit
-  hours_spine <- data.frame(
-    date_hour = seq.POSIXt(start_yr, end_yr - 3600, by = "hour")
-  )
-  hours_spine <- merge(hours_spine, units_df) # cross join (no common column)
 
   # clip stays to the reference year and derive hourly bounds
   mb_clipped <- mb
@@ -117,6 +121,18 @@ occupancy_daily <- function(data, year) {
   if (nrow(mb_clipped) == 0L) {
     stop("No stays overlap with ", year, " after clipping.", call. = FALSE)
   }
+
+  # include only units with at least one stay overlapping the reference year
+  units_df <- data.frame(
+    unit = sort(unique(mb_clipped$unit)),
+    stringsAsFactors = FALSE
+  )
+
+  # full hourly spine: every hour of the year x every included unit
+  hours_spine <- data.frame(
+    date_hour = seq.POSIXt(start_yr, end_yr - 3600, by = "hour")
+  )
+  hours_spine <- merge(hours_spine, units_df)
 
   # report exclusions
   excluded <- data.frame(
@@ -181,10 +197,35 @@ occupancy_daily <- function(data, year) {
   )
   names(hour_counts)[3] <- "n_hours"
 
-  eligible <- hour_counts[hour_counts$n_hours >= threshold, ]
+  eligible <- hour_counts[
+    hour_counts$n_hours > threshold &
+      hour_counts$level > 0,
+  ]
 
-  unit_size <- aggregate(level ~ unit, data = eligible, FUN = max)
-  names(unit_size)[2] <- "unit_size"
+  if (nrow(eligible) > 0L) {
+    unit_size <- aggregate(
+      level ~ unit,
+      data = eligible,
+      FUN = max
+    )
+    names(unit_size)[names(unit_size) == "level"] <- "unit_size"
+  } else {
+    unit_size <- data.frame(
+      unit = character(),
+      unit_size = integer(),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  # Keep every unit represented in the reference year.
+  # If no positive occupancy level occurred for >88 hours,
+  # unit size cannot be estimated and remains NA.
+  unit_size <- merge(
+    units_df,
+    unit_size,
+    by = "unit",
+    all.x = TRUE
+  )
 
   # daily census: average hourly counts within each day
   hourly_census$date <- as.Date(hourly_census$date_hour, tz = tz)

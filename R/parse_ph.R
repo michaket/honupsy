@@ -180,14 +180,25 @@ parse_honos_item <- function(x) {
   }
   val <- suppressWarnings(as.integer(x))
   list(
-    value = if (!is.na(val) && val == 9L) NA_integer_ else val,
+    value = if (!is.na(val) && val %in% 0:4) {
+      val
+    } else {
+      NA_integer_
+    },
     raw = val
   )
 }
 
 #' Calculate HoNOS total score
-#' Sums over available items; values of 9 (recoded to NA) are not counted.
-#' Returns list(total, n_valid)
+#'
+#' The total is the sum of the available HoNOS item scores. Items coded 9,
+#' blank, or otherwise missing are omitted from the sum; scores are not
+#' prorated to 12 items. `n_valid` reports the number of items contributing
+#' to the score. If no valid items are available, the total is `NA`.
+#'
+#' This reproduces the scoring approach used in the associated study.
+#'
+#' @return List with `total` and `n_valid`.
 #' @noRd
 honos_total_score <- function(...) {
   items <- c(...)

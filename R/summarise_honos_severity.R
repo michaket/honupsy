@@ -5,15 +5,24 @@
 #' data-quality counts, mean item scores, proportion of severe cases per item
 #' (score > 2), and mean total score.
 #'
-#' Item values of 9 ("not known / not applicable") are treated as missing and
-#' excluded from means. When computing the severe indicator, missing values
-#' (including 9s) are treated as non-severe (0), so that missingness does not
-#' inflate severity proportions.
+#' HoNOS item scores of 3 or 4 are classified as severe. Severe-item
+#' proportions use all cases in the MB dataset assigned to the respective
+#' unit as the denominator, reproducing the operationalisation used in the
+#' associated study. Cases without a non-dropout admission HoNOS assessment,
+#' and individual items that are missing or coded 9, are classified as
+#' non-severe for these proportions. Missing values are excluded when
+#' calculating item means.
+#'
+#' Item means and severe-item proportions therefore use different
+#' missing-data rules: item means are based on observed ratings, whereas
+#' severe-item proportions use all cases assigned to the unit as their
+#' denominator.
 #'
 #' The input must be the output of \code{\link{import_anq}} after unit
 #' assignments have been attached with \code{\link{assign_units}}. Cases
-#' without a unit assignment or without an admission HoNOS assessment are
-#' included in \code{n_cases} but contribute \code{NA} to the HoNOS means.
+#' without an admission HoNOS assessment remain included in
+#' \code{n_cases} and in the denominator of the severe-item proportions, but
+#' do not contribute to HoNOS item means or total-score summaries.
 #'
 #' @param data Named list. Output of \code{\link{import_anq}} with unit
 #'   assignments attached via \code{\link{assign_units}}.
@@ -33,10 +42,14 @@
 #'     i.e. assessments whose total is summed over an incomplete item set.
 #'   - `h1_mean`, ..., `h12_mean`: mean score per HoNOS item at admission
 #'     (9s excluded).
-#'   - `h1_prop_severe`, ..., `h12_prop_severe`: proportion of cases with a
-#'     severe score (> 2) per item. Missing and 9-coded values count as
-#'     non-severe.
-#'   - `honos_total_mean`: mean total HoNOS score at admission.
+#'   - `h1_prop_severe`, ..., `h12_prop_severe`: proportion of all cases
+#'     assigned to the unit with a severe admission score (3 or 4) on the
+#'     respective item. Cases without a non-dropout admission HoNOS
+#'     assessment and missing or 9-coded item values count as non-severe.
+#'   - `honos_total_mean`: mean admission HoNOS total, where each patient's
+#'     total is the sum of available item scores. Missing and 9-coded items
+#'     are omitted rather than prorated to 12 items. Assessments with no
+#'     valid HoNOS items do not contribute to the mean.
 #'
 #' @seealso \code{\link{summarise_composition}},
 #'   \code{\link{summarise_occupancy}}
@@ -80,6 +93,19 @@ summarise_honos_severity <- function(data) {
       !.data$is_dropout
     )
 
+  duplicate_adm <- unique(
+    ph_adm$fid[duplicated(ph_adm$fid)]
+  )
+
+  if (length(duplicate_adm) > 0L) {
+    stop(
+      "Multiple non-dropout admission HoNOS records found for FID(s): ",
+      paste(head(duplicate_adm, 5L), collapse = ", "),
+      ". Cannot calculate unit-level HoNOS summaries unambiguously.",
+      call. = FALSE
+    )
+  }
+
   # case counts from MB (source of truth for n_cases)
   unit_counts <- mb |>
     dplyr::filter(!is.na(.data$unit)) |>
@@ -91,15 +117,40 @@ summarise_honos_severity <- function(data) {
   ph_adm_unit <- ph_adm |>
     dplyr::filter(!is.na(.data$unit))
 
-  # compute severe indicators (9 / NA -> 0, >2 -> 1)
+  # Severe-item proportions reproduce the study operationalisation:
+  # denominator = all MB cases assigned to the unit.
+  severity_cases <- mb |>
+    dplyr::filter(!is.na(.data$unit)) |>
+    dplyr::select("fid", "unit") |>
+    dplyr::left_join(
+      ph_adm |>
+        dplyr::select(
+          "fid",
+          dplyr::all_of(item_cols)
+        ),
+      by = "fid"
+    )
+
   severe_cols <- paste0(item_cols, "_severe")
-  ph_adm_unit <- ph_adm_unit |>
+
+  severity_cases <- severity_cases |>
     dplyr::mutate(
       dplyr::across(
         dplyr::all_of(item_cols),
-        ~ dplyr::if_else(.x > 2L, 1L, 0L, missing = 0L),
+        ~ as.integer(!is.na(.x) & .x %in% 3:4),
         .names = "{.col}_severe"
       )
+    )
+
+  severity_summary <- severity_cases |>
+    dplyr::group_by(.data$unit) |>
+    dplyr::summarise(
+      dplyr::across(
+        dplyr::all_of(severe_cols),
+        ~ mean(.x),
+        .names = "{.col}_prop"
+      ),
+      .groups = "drop"
     )
 
   # aggregate
@@ -107,38 +158,34 @@ summarise_honos_severity <- function(data) {
     dplyr::group_by(.data$unit) |>
     dplyr::summarise(
       n_honos_adm = dplyr::n(),
-      # data quality: how complete are the assessments behind the means
       mean_items_rated = mean(.data$honos_n_valid, na.rm = TRUE),
       n_partial = sum(.data$honos_n_valid < 12L, na.rm = TRUE),
-      # means (NA for 9-coded values, already recoded in parser)
+
       dplyr::across(
         dplyr::all_of(item_cols),
         ~ mean(.x, na.rm = TRUE),
         .names = "{.col}_mean"
       ),
-      # proportions severe
-      dplyr::across(
-        dplyr::all_of(severe_cols),
-        ~ mean(.x, na.rm = TRUE),
-        .names = "{.col}_prop"
-      ),
+
       honos_total_mean = mean(.data$honos_total, na.rm = TRUE),
       .groups = "drop"
     )
 
-  # rename: h1_aggression_mean -> h1_mean, h1_aggression_severe_prop ->
-  # h1_prop_severe (cleaner output column names)
+  # join onto unit counts so units with no HoNOS still appear
+  result <- unit_counts |>
+    dplyr::left_join(ph_summary, by = "unit") |>
+    dplyr::left_join(severity_summary, by = "unit")
+
+  # rename: h1_aggression_mean -> h1_mean,
+  # h1_aggression_severe_prop -> h1_prop_severe
   item_short <- paste0("h", 1:12)
   old_mean <- paste0(item_cols, "_mean")
   new_mean <- paste0(item_short, "_mean")
   old_severe <- paste0(item_cols, "_severe_prop")
   new_severe <- paste0(item_short, "_prop_severe")
 
-  names(ph_summary)[match(old_mean, names(ph_summary))] <- new_mean
-  names(ph_summary)[match(old_severe, names(ph_summary))] <- new_severe
-
-  # join onto unit counts so units with no HoNOS still appear
-  result <- dplyr::left_join(unit_counts, ph_summary, by = "unit")
+  names(result)[match(old_mean, names(result))] <- new_mean
+  names(result)[match(old_severe, names(result))] <- new_severe
 
   # units with no admission HoNOS: 0 assessed, not NA
   result$n_honos_adm[is.na(result$n_honos_adm)] <- 0L

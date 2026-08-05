@@ -1,6 +1,6 @@
 Package: honupsy
 Title: Tools for Working with Routine Psychiatric Patient Data
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Michael", "Ketzer", , "michael.ketzer@unibas.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9633-3947"))
@@ -9,11 +9,13 @@ Description: Provides functions to import, validate, and summarise data
     psychiatry, implemented against the ANQ data definition for
     measurement year 2022 (MB, MP, PH, PB, and FM records).
 License: MIT + file LICENSE
+URL: https://github.com/michaket/honupsy
+BugReports: https://github.com/michaket/honupsy/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
-    dplyr,
+    dplyr (>= 1.0.0),
     rlang,
     stats,
     readxl,

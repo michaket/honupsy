@@ -251,6 +251,6 @@ against the data definition for the relevant measurement year.
 ## Next steps
 
 Once the data are imported and unit assignments are attached, the data frames
-can be used directly for analysis in R. Future versions of honupsy will add
-dedicated functions for descriptive summaries, admission-to-discharge change
-scores, and workload-related analyses.
+can be used directly for analysis in R. Unit-level descriptive summaries are 
+available through `summarise_composition()`, `summarise_honos_severity()`, and 
+`summarise_occupancy()`.

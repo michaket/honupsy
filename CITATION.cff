@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use honupsy, please cite this software."
+title: "honupsy"
+type: software
+authors:
+  - family-names: "Ketzer"
+    given-names: "Michael"
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/michaket/honupsy"

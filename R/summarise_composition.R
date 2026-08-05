@@ -43,7 +43,8 @@ safe_max <- function(x) if (all(is.na(x))) NA_real_ else max(x, na.rm = TRUE)
 #' @seealso \code{\link{summarise_honos_severity}},
 #'   \code{\link{summarise_occupancy}}
 #'
-#' @importFrom dplyr filter mutate summarise group_by n .data
+#' @importFrom dplyr filter mutate summarise group_by n
+#' @importFrom rlang .data
 #' @export
 #'
 #' @examples

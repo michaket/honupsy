@@ -42,7 +42,7 @@
 #'   \code{\link{summarise_occupancy}}
 #'
 #' @importFrom dplyr left_join filter mutate summarise group_by across
-#'   starts_with n .data
+#'   starts_with n
 #' @importFrom rlang .data
 #' @export
 #'

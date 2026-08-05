@@ -15,7 +15,8 @@ Imports:
     stats,
     readxl,
     purrr,
-    tools
+    tools,
+    utils
 Suggests: 
     knitr,
     rmarkdown,
@@ -23,6 +24,5 @@ Suggests:
     writexl
 Config/testthat/edition: 3
 Depends: 
-    R (>= 3.5)
-LazyData: true
+    R (>= 4.1)
 VignetteBuilder: knitr

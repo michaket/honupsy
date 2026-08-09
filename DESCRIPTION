@@ -1,9 +1,20 @@
 Package: honupsy
 Title: Tools for Working with Routine Psychiatric Patient Data
 Version: 0.1.0
-Authors@R: 
-    person("Michael", "Ketzer", , "michael.ketzer@unibas.ch", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-9633-3947"))
+Authors@R: c(
+    person("Michael", "Ketzer", , "michael.ketzer@unibas.ch",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9633-3947")),
+    person("Catherine", "Blatter",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-4069-7178")),
+    person("Beatrice", "Gehri",
+           role = "ctb",
+           comment = c(ORCID = "0000-0003-4808-0946")),
+    person("Michael", "Simon",
+           role = "ctb",
+           comment = c(ORCID = "0000-0003-2349-7219"))
+    )
 Description: Provides functions to import, validate, and summarise data
     from the Swiss national quality measurement in adult inpatient
     psychiatry, implemented against the ANQ data definition for

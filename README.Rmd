@@ -13,51 +13,33 @@ knitr::opts_chunk$set(
 )
 ```
 
-# The {honupsy} Package: Tools for Working with Routine Psychiatric Patient Data <img src="man/figures/hex.png" width = "150" align="right" alt="Hex sticker of the {honupsy} R package."/>
+# The {honupsy} Package: Tools for Working with Routine Psychiatric Patient Data <img src="man/figures/hex.png" alt="Hex sticker of the {honupsy} R package." width="150" align="right"/>
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/michaket/honupsy/graph/badge.svg?token=IUR4493DS7)](https://codecov.io/gh/michaket/honupsy)
+
+[![R-CMD-check](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml) [![codecov](https://codecov.io/gh/michaket/honupsy/graph/badge.svg?token=IUR4493DS7)](https://codecov.io/gh/michaket/honupsy)
+
 <!-- badges: end -->
 
-The goal of honupsy is to provide tools for working with routinely collected
-inpatient psychiatric data, with a particular focus on the Health of the Nation
-Outcome Scales (HoNOS) and unit-level indicators relevant to nursing workload
-and patient composition. The name combines its three concerns: **HO**NOS,
-**NU**rsing, **PSY**chiatry.
+The goal of honupsy is to provide tools for working with routinely collected inpatient psychiatric data, with a particular focus on the Health of the Nation Outcome Scales (HoNOS) and unit-level indicators relevant to nursing workload and patient composition. The name combines its three concerns: **HO**NOS, **NU**rsing, **PSY**chiatry.
 
-The package is built around the data infrastructure of the Swiss national
-quality measurement in inpatient psychiatry, coordinated by
-[ANQ](https://www.anq.ch). Each clinic's submission combines two layers: the
-administrative case data of the BFS Medical Statistics (collected by the
-Bundesamt für Statistik, BFS), and the ANQ measurement instruments layered on
-top -- HoNOS, BSCL, and coercive measures. Clinics are required by law to
-collect and submit these data; honupsy loads the submission files directly in
-R, without reformatting. Unit-level summaries additionally require unit (ward)
-assignments, which the ANQ format does not carry and which you attach
-separately.
+The package is built around the data infrastructure of the Swiss national quality measurement in inpatient psychiatry, coordinated by [ANQ](https://www.anq.ch). Each clinic's submission combines two layers: the administrative case data of the BFS Medical Statistics (collected by the Bundesamt für Statistik, BFS), and the ANQ measurement instruments layered on top -- HoNOS, BSCL, and coercive measures. Clinics are required by law to collect and submit these data; honupsy loads the submission files directly in R, without reformatting. Unit-level summaries additionally require unit (ward) assignments, which the ANQ format does not carry and which you attach separately.
 
 The package currently supports:
 
--   importing ANQ submission files in all standard formats (TXT with pipe,
-    semicolon or tab delimiter; XLSX; official ANQ data-entry template)
--   parsing all relevant record types: the BFS case data (MB, minimal dataset;
-    MP, psychiatry supplement) and the ANQ instruments (PH, HoNOS; PB, BSCL;
-    FM, coercive measures)
+-   importing ANQ submission files in all standard formats (TXT with pipe, semicolon or tab delimiter; XLSX; official ANQ data-entry template)
+-   parsing all relevant record types: the BFS case data (MB, minimal dataset; MP, psychiatry supplement) and the ANQ instruments (PH, HoNOS; PB, BSCL; FM, coercive measures)
 -   validating imported data for completeness and plausibility
 -   computing HoNOS total scores and handling missing or not-applicable items
 -   attaching user-supplied unit (ward) assignments to imported data
--   summarising case composition, admission HoNOS severity, and unit
-    occupancy at the unit level
+-   summarising case composition, admission HoNOS severity, and unit occupancy at the unit level
 -   generating synthetic HoNOS case data for quick experimentation
 
-Future versions will add estimation procedures for workload and staffing-
-related analyses.
+Future versions will add estimation procedures for workload and staffing-related analyses.
 
 ## Installation
 
-You can install the development version of honupsy from
-[GitHub](https://github.com/) with:
+You can install honupsy from [GitHub](https://github.com/) with:
 
 ```{r}
 # install.packages("pak")
@@ -95,10 +77,7 @@ head(data$fm[, c("fid", "measure_label", "duration_min")])
 
 ### Assigning units
 
-Unit (ward) assignments are not part of the standard ANQ submission format, so
-they are supplied separately and attached to the imported data. In practice you
-would read your own lookup file with `import_unit_assignments()`; here we create
-a small random lookup so the example is self-contained.
+Unit (ward) assignments are not part of the standard ANQ submission format, so they are supplied separately and attached to the imported data. In practice you would read your own lookup file with `import_unit_assignments()`; here we create a small random lookup so the example is self-contained.
 
 ```{r example-units}
 set.seed(1)
@@ -113,9 +92,7 @@ data  <- assign_units(data, units)
 
 ### Summarising the data
 
-With units attached, the `summarise_*()` functions return one row per unit.
-Each also reports how much data backs the figures, so a summary cannot quietly
-rest on missing or incomplete records.
+With units attached, the `summarise_*()` functions return one row per unit. Each also reports how much data backs the figures, so a summary cannot quietly rest on missing or incomplete records.
 
 ```{r example-summarise}
 # case composition per unit. n_*_missing report cases excluded from each
@@ -130,15 +107,9 @@ sev <- summarise_honos_severity(data)
 sev[, c("unit", "n_cases", "prop_assessed", "h1_mean", "honos_total_mean")]
 ```
 
-Unit occupancy expands each stay to hourly intervals over a calendar year.
-`occupancy_daily()` returns the daily census per unit (one row per unit and
-day), and `summarise_occupancy()` aggregates that to annual per-unit figures —
-estimated unit size, mean/max census, and occupancy rates. Cases dropped for
-missing fields or for not overlapping the year are reported via a message and
-the `"excluded"` attribute. The expansion can be slow on large datasets, so
-these are shown here but not run:
+Unit occupancy expands each stay to hourly intervals over a calendar year. `occupancy_daily()` returns the daily census per unit (one row per unit and day), and `summarise_occupancy()` aggregates that to annual per-unit figures — estimated unit size, mean/max census, and occupancy rates. Cases dropped for missing fields or for not overlapping the year are reported via a message and the `"excluded"` attribute. The expansion can be slow on large datasets, so these are shown here but not run:
 
-```r
+``` r
 # daily census per unit -- the basis for plotting occupancy over time
 occ <- occupancy_daily(data, year = 2023)
 head(occ$daily)            # unit, date, census, occ_rate
@@ -152,10 +123,7 @@ result$excluded
 
 ### Synthetic data
 
-`sample_cases()` generates synthetic cases in the same structure as
-`import_anq()`, so you can develop and test against the full pipeline without
-real patient data. Unit assignments are attached separately, exactly as for
-real data.
+`sample_cases()` generates synthetic cases in the same structure as `import_anq()`, so you can develop and test against the full pipeline without real patient data. Unit assignments are attached separately, exactly as for real data.
 
 ```{r example-synthetic}
 sim <- sample_cases(n = 200)
@@ -170,9 +138,7 @@ sim <- assign_units(sim, import_unit_assignments(lookup))
 summarise_composition(sim)
 ```
 
-The probability arguments inject controlled messiness — dropouts, items coded
-9, missing discharge dates — which is useful for exercising the data-quality
-columns the summaries report:
+The probability arguments inject controlled messiness — dropouts, items coded 9, missing discharge dates — which is useful for exercising the data-quality columns the summaries report:
 
 ```{r example-synthetic-messy}
 messy <- sample_cases(
@@ -193,27 +159,18 @@ summarise_honos_severity(messy)[, c("unit", "n_cases", "prop_assessed")]
 
 ## Data Format
 
-honupsy works with the standard ANQ submission format. No reformatting
-is required: the same files your clinic prepares for submission to ANQ can
-be loaded directly into R with `import_anq()`. Supported formats are:
+honupsy works with the standard ANQ submission format. No reformatting is required: the same files your clinic prepares for submission to ANQ can be loaded directly into R with `import_anq()`. Supported formats are:
 
-- Pipe-, semicolon- or tab-delimited TXT files
-- XLSX files with one worksheet per record type
-- The official ANQ data-entry template (Excel)
+-   Pipe-, semicolon- or tab-delimited TXT files
+-   XLSX files with one worksheet per record type
+-   The official ANQ data-entry template (Excel)
 
-Both single mixed files (all record types in one file) and separate files
-per record type are supported.
+Both single mixed files (all record types in one file) and separate files per record type are supported.
 
 ## Scope
 
-honupsy 0.1.0 implements the ANQ adult inpatient psychiatry data format for 
-measurement year 2022, including MB, MP, PH, PB, and FM records. Compatibility 
-with other measurement years is not guaranteed. The SpiGes-based format 
-introduced from measurement year 2026 is not supported.
+honupsy 0.1.0 implements the ANQ adult inpatient psychiatry data format for measurement year 2022, including MB, MP, PH, PB, and FM records. Compatibility with other measurement years is not guaranteed. The SpiGes-based format introduced from measurement year 2026 is not supported.
 
 ## About the Hex Sticker
 
-The honupsy hex sticker features a Valais Blacknose Sheep
-(Walliser Schwarznasenschaf). These sheep are known for their exceptionally
-gentle and approachable nature and are used in animal-assisted therapy and
-support for children and adults with emotional or physical impairments.
+The honupsy hex sticker features a Valais Blacknose Sheep (Walliser Schwarznasenschaf). These sheep are known for their exceptionally gentle and approachable nature and are used in animal-assisted therapy and support for children and adults with emotional or physical impairments.

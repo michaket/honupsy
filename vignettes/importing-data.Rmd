@@ -84,7 +84,7 @@ library(honupsy)
 data <- import_anq("path/to/data.txt")
 
 # import from the official ANQ data-entry template
-data <- import_anq("path/to/ANQ_PSY_EP_Dateneingabe_Messjahr-2024.xlsx")
+data <- import_anq("path/to/anq_data_entry_template.xlsx")
 
 # import from separate files per record type
 data <- import_anq(c(

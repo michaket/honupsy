@@ -2,9 +2,28 @@ cff-version: 1.2.0
 message: "If you use honupsy, please cite this software."
 title: "honupsy"
 type: software
+
 authors:
   - family-names: "Ketzer"
     given-names: "Michael"
-version: 0.1.0
+    orcid: "https://orcid.org/0000-0002-9633-3947"
+    affiliation: "University of Basel, Institute of Nursing Science, Department Public Health, Basel, Switzerland; University Psychiatric Clinics (UPK) Basel, Basel, Switzerland"
+
+  - family-names: "Blatter"
+    given-names: "Catherine"
+    orcid: "https://orcid.org/0000-0002-4069-7178"
+    affiliation: "University of Basel, Institute of Nursing Science, Department Public Health, Basel, Switzerland; University Hospital Basel (USB), Basel, Switzerland"
+
+  - family-names: "Gehri"
+    given-names: "Beatrice"
+    orcid: "https://orcid.org/0000-0003-4808-0946"
+    affiliation: "University of Basel, Institute of Nursing Science, Department Public Health, Basel, Switzerland; University Psychiatric Clinics (UPK) Basel, Basel, Switzerland"
+
+  - family-names: "Simon"
+    given-names: "Michael"
+    orcid: "https://orcid.org/0000-0003-2349-7219"
+    affiliation: "University of Basel, Institute of Nursing Science, Department Public Health, Basel, Switzerland"
+
+version: "0.1.0"
 license: MIT
 repository-code: "https://github.com/michaket/honupsy"

@@ -52,56 +52,6 @@ You can install honupsy from [GitHub](https://github.com/) with:
 ``` r
 # install.packages("pak")
 pak::pak("michaket/honupsy")
-#> ℹ Loading metadata database
-#> ✔ Loading metadata database ... done
-#> 
-#> 
-#> → Will install 19 packages.
-#> → Will update 1 package.
-#> → Will download 1 package with unknown size.
-#> + cellranger         1.1.0  
-#> + cli                3.6.6  🔧
-#> + dplyr              1.2.1  🔧
-#> + generics           0.1.4  
-#> + glue               1.8.1  🔧
-#> + honupsy    0.1.0 → 0.1.0  👷🏿🔧 ⬇ (GitHub: 8bfe6b4)
-#> + lifecycle          1.0.5  
-#> + magrittr           2.0.5  🔧
-#> + pillar             1.11.1 
-#> + pkgconfig          2.0.3  
-#> + purrr              1.2.2  🔧
-#> + R6                 2.6.1  
-#> + readxl             1.5.0  🔧
-#> + rematch            2.0.0  
-#> + rlang              1.3.0  🔧
-#> + tibble             3.3.1  🔧
-#> + tidyselect         1.2.1  
-#> + utf8               1.2.6  🔧
-#> + vctrs              0.7.3  🔧
-#> + withr              3.0.3
-#> ℹ Getting 1 pkg with unknown size, 19 (12.61 MB) cached
-#> ✔ Cached copy of honupsy 0.1.0 (source) is the latest build
-#> ✔ Installed honupsy 0.1.0 (github::michaket/honupsy@8bfe6b4) (227ms)
-#> ✔ Installed R6 2.6.1  (230ms)
-#> ✔ Installed cellranger 1.1.0  (233ms)
-#> ✔ Installed generics 0.1.4  (194ms)
-#> ✔ Installed cli 3.6.6  (283ms)
-#> ✔ Installed dplyr 1.2.1  (289ms)
-#> ✔ Installed glue 1.8.1  (274ms)
-#> ✔ Installed lifecycle 1.0.5  (278ms)
-#> ✔ Installed magrittr 2.0.5  (148ms)
-#> ✔ Installed pillar 1.11.1  (72ms)
-#> ✔ Installed pkgconfig 2.0.3  (63ms)
-#> ✔ Installed purrr 1.2.2  (114ms)
-#> ✔ Installed readxl 1.5.0  (83ms)
-#> ✔ Installed rematch 2.0.0  (75ms)
-#> ✔ Installed rlang 1.3.0  (91ms)
-#> ✔ Installed tibble 3.3.1  (86ms)
-#> ✔ Installed tidyselect 1.2.1  (71ms)
-#> ✔ Installed utf8 1.2.6  (74ms)
-#> ✔ Installed vctrs 0.7.3  (91ms)
-#> ✔ Installed withr 3.0.3  (74ms)
-#> ✔ 1 pkg + 19 deps: upd 1, added 19 [8.6s]
 ```
 
 ## Examples

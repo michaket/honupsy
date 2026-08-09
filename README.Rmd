@@ -41,7 +41,7 @@ Future versions will add estimation procedures for workload and staffing-related
 
 You can install honupsy from [GitHub](https://github.com/) with:
 
-```{r}
+```{r, eval=FALSE}
 # install.packages("pak")
 pak::pak("michaket/honupsy")
 ```

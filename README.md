@@ -7,6 +7,7 @@
 
 [![R-CMD-check](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michaket/honupsy/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/michaket/honupsy/graph/badge.svg?token=IUR4493DS7)](https://codecov.io/gh/michaket/honupsy)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21860224.svg)](https://doi.org/10.5281/zenodo.21860224)
 
 <!-- badges: end -->
 
